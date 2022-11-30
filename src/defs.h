@@ -7,6 +7,7 @@
 #include <time.h>
 #include <unistd.h>
 
+#define C_MEM_ERR -1
 #define MAX_STR 64
 #define FEAR_RATE 1
 #define MAX_FEAR 100
@@ -36,8 +37,8 @@ typedef struct RoomList {
 
 typedef struct Building {
     GhostType* ghost;
-    RoomListType* rooms;
-    HunterType** hunters[MAX_HUNTERS];
+    RoomListType rooms;
+    HunterType hunters[MAX_HUNTERS];
 } BuildingType;
 
 typedef struct Room {
@@ -83,3 +84,10 @@ void populateRooms(BuildingType*);  // Populates the building with sample data f
 
 //all the forward definitions for functions
 void initRoom();
+void appendRoom(RoomListType*, RoomType*);
+void connectRooms(RoomType*, RoomType*);
+
+void initGhost(int, GhostClassType, RoomType*, float, GhostType**);
+void cleanupGhost(GhostType*);
+
+void initBuilding(BuildingType*);

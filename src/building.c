@@ -1,5 +1,15 @@
 #include "defs.h"
 
+// Function:  initBuilding
+//       in:  Location of BuildingType to be modified
+//      out:  Modified BuildingType
+//  Purpose:  initializes fields of the given building parameter
+void initBuilding(BuildingType* building) {
+    building->ghost = NULL;
+    building->hunters = NULL;
+    building->rooms = NULL;
+}
+
 /*
     Note: While this function is provided, you will likely want
     to modify it to suit your solution. This has been provided
