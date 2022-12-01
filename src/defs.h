@@ -7,7 +7,12 @@
 #include <time.h>
 #include <unistd.h>
 
+#define C_NO_ROOMS -5
+#define C_SEM_ERR -4
+#define C_ARR_ERR -3
+#define C_ARR_FULL -2
 #define C_MEM_ERR -1
+#define C_OK 0
 #define MAX_STR 64
 #define FEAR_RATE 1
 #define MAX_FEAR 100
@@ -38,7 +43,7 @@ typedef struct RoomList {
 typedef struct Building {
     GhostType* ghost;
     RoomListType rooms;
-    HunterType hunters[MAX_HUNTERS];
+    HunterType* hunters[MAX_HUNTERS];
 } BuildingType;
 
 typedef struct Room {
@@ -47,6 +52,8 @@ typedef struct Room {
     EvidenceListType evidenceList;
     HunterType* hunters[MAX_HUNTERS];
     GhostType* ghost;
+    int hunterCount;
+    sem_t mutex;
 } RoomType;
 
 typedef struct Ghost {
@@ -82,10 +89,13 @@ float randFloat(float, float);  // Generates a pseudorandom float between the pa
 
 void populateRooms(BuildingType*);  // Populates the building with sample data for rooms
 
-//all the forward definitions for functions
+// all the forward definitions for functions
 void initRoom();
 void appendRoom(RoomListType*, RoomType*);
 void connectRooms(RoomType*, RoomType*);
+void addHunter(RoomType*, HunterType*);
+void removeHunter(RoomType*, HunterType*);
+void cleanupRoom(RoomType*);
 
 void initGhost(int, GhostClassType, RoomType*, float, GhostType**);
 void cleanupGhost(GhostType*);
