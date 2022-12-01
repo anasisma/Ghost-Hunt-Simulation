@@ -7,6 +7,14 @@
 void initRoom(RoomType* room, char* name) {
 
     //Checking if room was allocated correctly (since calloc is called outside of initRoom)
+    if (room == NULL) {                                         
+        printf("Memory allocation error: couldn't calloc new RoomType!\n");
+        exit(C_MEM_ERR);
+    }
+
+    //Initilizing name based on parameter
+    strcpy(room->);
+
 
 }
 
@@ -29,12 +37,15 @@ void appendRoom(RoomListType* list, RoomType* room) {
     newRoomNode->room = room;
     newRoomNode->next = NULL;
 
-    if (list->head == NULL) {  // if list is empty, both head and tail need to point to same node
+    //If list is empty, both head and tail need to point to new node
+    if (list->head == NULL) {
         list->head = newRoomNode;
         list->tail = newRoomNode;
-    } else {  // otherwise add node after the tail
+
+    //Otherwise add node after the tail
+    } else {  
         list->tail->next = newRoomNode;
-        list->tail = list->tail->next;
+        list->tail = newRoomNode;
     }
 }
 

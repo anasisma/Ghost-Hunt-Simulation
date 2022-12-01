@@ -43,8 +43,8 @@ typedef struct Building {
 
 typedef struct Room {
     char name[MAX_STR];
-    RoomListType* connectedRooms;
-    EvidenceListType* evidenceList;
+    RoomListType connectedRooms;
+    EvidenceListType evidenceList;
     HunterType* hunters[MAX_HUNTERS];
     GhostType* ghost;
 } RoomType;
