@@ -7,6 +7,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#define C_TRUE 1
+#define C_FALSE 0
 #define C_NO_ROOMS -5
 #define C_SEM_ERR -4
 #define C_ARR_ERR -3
@@ -38,6 +40,7 @@ typedef struct RoomNode {
 typedef struct RoomList {
     RoomNodeType* head;
     RoomNodeType* tail;
+    int roomCount;
 } RoomListType;
 
 typedef struct Building {
@@ -97,7 +100,15 @@ void addHunter(RoomType*, HunterType*);
 void removeHunter(RoomType*, HunterType*);
 void cleanupRoom(RoomType*);
 
-void initGhost(int, GhostClassType, RoomType*, float, GhostType**);
+void initGhost(int, GhostClassType, GhostType**);
 void cleanupGhost(GhostType*);
 
 void initBuilding(BuildingType*);
+
+void getHunterNames(char**);
+void initHunters(pthread_t*);
+void createInitHunters(HunterType*);
+void createHunterThreads(pthread_t* hunterThreads);
+void placeGhostRandRoom(GhostType*, BuildingType*);
+
+void cleanupBuilding(BuildingType*);

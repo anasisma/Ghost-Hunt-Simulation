@@ -50,6 +50,7 @@ void appendRoom(RoomListType *list, RoomType *room) {
         list->tail->next = newRoomNode;
         list->tail = newRoomNode;
     }
+    list->roomCount++;
 }
 
 //  Function:  connectRooms

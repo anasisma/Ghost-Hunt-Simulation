@@ -8,6 +8,7 @@ void initBuilding(BuildingType* building) {
     building->ghost = NULL;
     building->hunters = NULL;
     building->rooms = NULL;
+    building->roomCount = 0;
 }
 
 /*
@@ -115,4 +116,7 @@ void populateRooms(BuildingType* building) {
     connectRooms(kitchen, living_room);
     connectRooms(kitchen, garage);
     connectRooms(garage, utility_room);
+}
+
+void cleanupBuilding(BuildingType* building) {
 }
