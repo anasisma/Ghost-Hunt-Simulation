@@ -54,13 +54,18 @@ int main(int argc, char* argv[]) {
         pthread_join(*hunterThreads[i], NULL);
     }
 
+    //Printing results of simulation
+    printResults(&building);
+
     // Freeing memory
     cleanupBuilding(&building);
 
+    //Freeing dynamically allocated hunter thread
     for (int i = 0; i < MAX_HUNTERS; i++) {
         free(hunterThreads[i]);
     }
 
+    //Freeing dynamically allocated hunter names
     for (int i = 0; i < MAX_HUNTERS; i++) {
         free(names[i]);
     }
@@ -82,17 +87,10 @@ void placeGhostRandRoom(GhostType* ghost, BuildingType* building) {
 
 //  Function: createInitHunters
 //     in/ou: Pointer to array of HunterType pointers
-//   Purpose: Allocates and initilizes HunterTypes and stores them in given array
+//   Purpose: Creates and initilizes HunterTypes and stores them in given array
 void createInitHunters(HunterType* hunters) {
     for (int i = 0; i < MAX_HUNTERS; i++) {
-        HunterType* hunter = (HunterType*)malloc(sizeof(HunterType));
-
-        // Checking if hunter was allocated correctly
-        if (hunter == NULL) {
-            printf("Memory allocation error: couldn't malloc new hunter!\n");
-            exit(C_MEM_ERR);
-        }
-
+        HunterType* hunter;
         initHunter(hunter);
         hunters[i] = hunter;
     }
@@ -135,6 +133,14 @@ void getHunterNames(char** names) {
         scanf("%s", name);
         names[i] = name;
     }
+}
+
+//  Function: printResults
+//        in: Pointer to BuildingType where simulation has ended
+//   Purpose: Prints the results of a completed simulation in a given building
+//  Comments: Assumes function is only called on a building whose simulation has ended
+printResults(BuildingType* building) {
+
 }
 
 /*

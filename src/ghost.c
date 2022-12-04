@@ -19,10 +19,9 @@ void initGhost(int bored, GhostClassType gt, GhostType **ghost) {
 }
 
 //   Function:  hunterInRoom
-//         in:  Pointer to ghost to check if hunters are in same room
-//    Purpose:  Check if ghost's boredom needs to be modified
+//         in:  Pointer to GhostType
+//    Purpose:  Check if there is a hunter in the same room as given ghost
 int hunterInRoom(GhostType *ghost) {
-    int status;
     if (ghost->room->hunterCount > 0)
         return 1;
     return 0;
@@ -86,6 +85,7 @@ void *startGhost(void *b) {
 
             //Checking if ghost is bored
             if (ghost->boredom <= 0) {
+                //Ending this thread by breaking main loop
                 break;
             }
 
@@ -103,14 +103,6 @@ void *startGhost(void *b) {
                 
             //Sleep
             usleep(USLEEP_TIME);
-
-        }
-
-
-
-
-        
-        
-        
+        }  
     }
 }

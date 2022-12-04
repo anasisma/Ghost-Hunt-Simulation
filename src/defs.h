@@ -104,6 +104,7 @@ void initGhost(int, GhostClassType, GhostType**);
 void cleanupGhost(GhostType*);
 
 void initBuilding(BuildingType*);
+void printResults(BuildingType*);
 
 void getHunterNames(char**);
 void initHunters(pthread_t*);
