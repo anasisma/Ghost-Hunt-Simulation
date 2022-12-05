@@ -4,38 +4,38 @@ int main(int argc, char* argv[]) {
     // Initialize a random seed for the random number generators
     srand(time(NULL));
 
-    // Creating array of hunter names
-    char* names[MAX_HUNTERS];
+    // // Creating array of hunter names
+    // char* names[MAX_HUNTERS];
 
-    // Getting names from user
-    printf("Ghost and hunters simulation!");
-    getHunterNames(names);
+    // // Getting names from user
+    // printf("Ghost and hunters simulation!");
+    // getHunterNames(names);
 
     // Creating building, initilizing it, and populating it with rooms
     BuildingType building;
     initBuilding(&building);
     populateRooms(&building);
 
-    // Creating and initlizing hunters
-    HunterType* hunters[MAX_HUNTERS];
-    createInitHunters(hunters, names);
+    // // Creating and initlizing hunters
+    // HunterType* hunters[MAX_HUNTERS];
+    // createInitHunters(hunters, names);
 
     // Creating and initializing ghost
     GhostType* ghost;
     int ghostClass = randInt(0, 4);
-    initGhost(BOREDOM_MAX, ghostClass, ghost);
+    initGhost(BOREDOM_MAX, ghostClass, &ghost);
 
-    // Placing hunters into the van
-    for (int i = 0; i < MAX_HUNTERS; i++) {
-        addHunter(building.rooms->head, hunters[i]);
-    }
+    // // Placing hunters into the van
+    // for (int i = 0; i < MAX_HUNTERS; i++) {
+    //     addHunter(building.rooms->head, hunters[i]);
+    // }
     
     // Placing ghost in random room (other than van)
     placeGhostRandRoom(ghost, &building);
 
-    // Creating and initilizing hunter threads
-    pthread_t* hunterThreads[MAX_HUNTERS];
-    createHunterThreads(hunters);
+    // // Creating and initilizing hunter threads
+    // pthread_t* hunterThreads[MAX_HUNTERS];
+    // createHunterThreads(hunters);
 
     // Creating ghost thread
     pthread_t ghostThread;
@@ -43,32 +43,32 @@ int main(int argc, char* argv[]) {
     // Running threads
     pthread_create(&ghostThread, NULL, startGhost, ghost);
 
-    for (int i = 0; i < MAX_HUNTERS; i++) {
-        pthread_create(hunterThreads[i], NULL, startHunter, hunters[i]);
-    }
+    // for (int i = 0; i < MAX_HUNTERS; i++) {
+    //     pthread_create(hunterThreads[i], NULL, startHunter, hunters[i]);
+    // }
 
     // Waiting on threads
     pthread_join(ghostThread, NULL);
 
-    for (int i = 0; i < MAX_HUNTERS; i++) {
-        pthread_join(*hunterThreads[i], NULL);
-    }
+    // for (int i = 0; i < MAX_HUNTERS; i++) {
+    //     pthread_join(*hunterThreads[i], NULL);
+    // }
 
-    //Printing results of simulation
-    printResults(&building);
+    // //Printing results of simulation
+    // printResults(&building);
 
-    // Freeing memory
-    cleanupBuilding(&building);
+    // // Freeing memory
+    // cleanupBuilding(&building);
 
-    //Freeing dynamically allocated hunter thread
-    for (int i = 0; i < MAX_HUNTERS; i++) {
-        free(hunterThreads[i]);
-    }
+    // //Freeing dynamically allocated hunter thread
+    // for (int i = 0; i < MAX_HUNTERS; i++) {
+    //     free(hunterThreads[i]);
+    // }
 
-    //Freeing dynamically allocated hunter names
-    for (int i = 0; i < MAX_HUNTERS; i++) {
-        free(names[i]);
-    }
+    // //Freeing dynamically allocated hunter names
+    // for (int i = 0; i < MAX_HUNTERS; i++) {
+    //     free(names[i]);
+    // }
 
     return 0;
 }
@@ -77,8 +77,8 @@ int main(int argc, char* argv[]) {
 //    in/ou: Pointer to building where ghost will be added
 //  Purpose: Puts ghost in a random room in the building (other than the van)
 void placeGhostRandRoom(GhostType* ghost, BuildingType* building) {
-    int roomNum = randInt(1, building->rooms->roomCount);
-    RoomNodeType iterator = building->rooms->head;
+    int roomNum = randInt(1, building->rooms.roomCount);
+    RoomNodeType* iterator = building->rooms.head;
     for (int i = 0; i < roomNum; i++) {
         iterator = iterator->next;
     }
@@ -89,7 +89,7 @@ void placeGhostRandRoom(GhostType* ghost, BuildingType* building) {
 //  Function: createHunterThreads
 //     in/ou: Pointer to array of pthread_t pointers
 //   Purpose: Allocates pthread_t and stores them in given array
-void createHunterThreads(pthread_t* hunterThreads) {
+void createHunterThreads(pthread_t** hunterThreads) {
     for (int i = 0; i < MAX_HUNTERS; i++) {
         pthread_t* hunterThread = (pthread_t*)malloc(sizeof(pthread_t));
 
@@ -129,7 +129,7 @@ void getHunterNames(char** names) {
 //        in: Pointer to BuildingType where simulation has ended
 //   Purpose: Prints the results of a completed simulation in a given building
 //  Comments: Assumes function is only called on a building whose simulation has ended
-printResults(BuildingType* building) {
+void printResults(BuildingType* building) {
 
 }
 

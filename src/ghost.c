@@ -38,16 +38,16 @@ void leaveEvidence(GhostType* ghost) {
         
         //Initalizing new evidence
         EvidenceType* evidence;
-        initEvidence(evidence);
+        initEvidence(&evidence);
 
         //Creating evidence based on ghost
         createEvidence(ghost, evidence);
 
         //Adding evidence to current room
-        appendEvidence(ghost->room->evidenceList, evidence);
+        appendEvidence(&(ghost->room->evidenceList), evidence);
 
         //Unlocking current room
-        sem_post(&(currentRoom->mutex));
+        sem_post(&(ghost->room->mutex));
     }
 }
 
@@ -60,7 +60,7 @@ void makeMove(GhostType* ghost) {
     if (sem_trywait(&(ghost->room->mutex)) == 0) {
         // Get a random connected room to move to
         int nextRoom = randInt(0, ghost->room->connectedRooms.roomCount);
-        RoomNodeType iterator = ghost->room->connectedRooms.head;
+        RoomNodeType* iterator = ghost->room->connectedRooms.head;
         for (int i = 0; i < nextRoom; i++) {
             iterator = iterator->next;
         }
@@ -85,10 +85,9 @@ void makeMove(GhostType* ghost) {
 //   Function:  startGhost
 //      in/ou:  Location of building ghost is in
 //    Purpose:  Ghost thread start function
-void *startGhost(void *b) {
+void *startGhost(void *g) {
 
-    BuildingType* building = (Building*) b;
-    GhostType* ghost = building->ghost;
+    GhostType* ghost = (GhostType*) g;
 
     //Main loop
     while (C_TRUE) {
@@ -135,5 +134,7 @@ void *startGhost(void *b) {
             //Sleep
             usleep(USLEEP_TIME);
         }  
+
+        printf("Ghost boredom: %d\n", ghost->boredom);
     }
 }

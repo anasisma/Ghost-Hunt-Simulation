@@ -3,8 +3,8 @@ LIB = -lpthread -lm
 OBJ = building evidence ghost hunter main room
 OBJ2 = building.o evidence.o ghost.o hunter.o main.o room.o
 
-all: $(OBJ)
-	$(CC) -o linkedFiles $(OBJ2) $(LIB)
+all:
+	$(CC) -o final building.c evidence.c ghost.c hunter.c main.c room.c $(LIB) -g
 
 building: building.c
 	$(CC) building.c -c building $(LIB)

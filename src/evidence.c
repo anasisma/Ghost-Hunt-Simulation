@@ -11,9 +11,6 @@ void initEvidence(EvidenceType **evidence) {
         printf("Memory allocation error\n");
         exit(C_MEM_ERR);
     }
-    
-    newEvid->value = NULL;
-    newEvid->evidenceClass = NULL;
 
     *evidence = newEvid;  // return this new structure using the evidence parameter
 }
@@ -22,7 +19,7 @@ void initEvidence(EvidenceType **evidence) {
 /*         in:  Location of EvidenceListType to be modified            */
 /*        out:  Modified EvidenceListType                               */
 /*    Purpose:  initializes both fields of the given list parameter to default values      */
-void initEvidenceList(GhostListType* list) {
+void initEvidenceList(EvidenceListType* list) {
     list->head = NULL;
     list->tail = NULL;  // set both head and tail (list starts as empty)
 }
@@ -68,7 +65,7 @@ void createEvidence(GhostType* ghost, EvidenceType* evidence) {
     EvidenceClassType evidenceClass;
 
     //Generating evidence value based on ghost type
-    switch(ghost->ghost) {
+    switch(ghost->ghostClass) {
         
         case POLTERGEIST:
             if (evidenceType == 0) {
@@ -92,7 +89,7 @@ void createEvidence(GhostType* ghost, EvidenceType* evidence) {
                 evidenceClass = TEMPERATURE;
             } else {
                 getSound(&value);
-                evidence = SOUND;
+                evidenceClass = SOUND;
             }
             break;
 

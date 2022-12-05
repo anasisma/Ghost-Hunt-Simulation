@@ -20,11 +20,11 @@ void initHunter(HunterType** hunter) {
 void createInitHunters(HunterType* hunters, char** names) {
     for (int i = 0; i < MAX_HUNTERS; i++) {
         HunterType* hunter;
-        initHunter(hunter);
+        initHunter(&hunter);
         int class = randInt(0, 4);
         hunter->evidenceClass = class;
         strcpy(hunter->name, names[i]);
-        hunters[i] = hunter;
+        hunters[i] = *hunter;
     }
 }
 

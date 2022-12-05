@@ -59,8 +59,14 @@ void appendRoom(RoomListType *list, RoomNodeType *roomNode) {
 //     in/ou:  Location of second RoomType
 //   Purpose:  Add each room to each other's RoomListType
 void connectRooms(RoomType *r1, RoomType *r2) {
-    appendRoom(r1->connectedRooms, r2);
-    appendRoom(r2->connectedRooms, r1);
+
+    RoomNodeType* n1 = (RoomNodeType*)malloc(sizeof(RoomNodeType));
+    RoomNodeType* n2 = (RoomNodeType*)malloc(sizeof(RoomNodeType));
+    n1->room = r1;
+    n2->room = r2;
+
+    appendRoom(&(r1->connectedRooms), n2);
+    appendRoom(&(r2->connectedRooms), n1);
 }
 
 //  Function:  addHunter
