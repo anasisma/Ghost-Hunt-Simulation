@@ -12,8 +12,8 @@ void initRoom(RoomType *room, char *name) {
     }
 
     // Initlizing mutex
-    if (sem_init(&room->mutex, 0, 1) < 0) {
-        printf("Semaphore error: couldn't initlize mutex!\n");
+    if (sem_init(&(room->mutex), 0, 1) < 0) {
+        printf("Semaphore error: couldn't initlize room mutex!\n");
         exit(C_SEM_ERR);
     }
 
@@ -85,6 +85,9 @@ void addHunter(RoomType *room, HunterType *hunter) {
 
     // Setting hunter's room attribute
     hunter->room = room;
+
+    // Incrementing the room's hunterCount
+    room->hunterCount++;
 }
 
 //  Function:  removeHunter
@@ -100,13 +103,13 @@ void removeHunter(RoomType *room, HunterType *hunter) {
     }
     for (int i = 0; i < size; i++) {
         if (room->hunters[i] == hunter) {
-            if (size < MAX_HUNTERS) {
-                for (int j = i; j < size; j++) {
-                    room->hunters[j] = room->hunters[j + 1];
-                }
+            for (int j = i; j < size - 1; j++) {
+                room->hunters[j] = room->hunters[j + 1];
             }
+            
             room->hunters[size] = NULL;
-            size--;
+            room->hunterCount--;
+            hunter->room = NULL;
             return;
         }
     }

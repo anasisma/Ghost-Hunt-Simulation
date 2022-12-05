@@ -7,7 +7,7 @@
 //    Purpose:  Initializes all fields of the given EvidenceType parameter
 void initEvidence(EvidenceType **evidence) {
     EvidenceType *newEvid = (EvidenceType *)malloc(sizeof(EvidenceType));  // allocate mem for new ghost
-    if (newEvid == NULL) {                                                 // if memory failed to allocate, shut the program down
+    if (newEvid == NULL) { // if memory failed to allocate, shut the program down
         printf("Memory allocation error\n");
         exit(C_MEM_ERR);
     }
@@ -51,6 +51,30 @@ void appendEvidence(EvidenceListType* list, EvidenceType* evidence) {
     } else {
         list->tail->next = newEvidenceNode;
         list->tail = newEvidenceNode;
+    }
+}
+
+//  Function:  removeEvidence
+//     in/ou:  Location of EvidenceListType to remove evidence from
+//        in:  Location of EvidenceType to remove
+//   Purpose:  Remove evidence from given EvidenceListType
+void removeEvidence(EvidenceListType* list, EvidenceType* evidence) {
+    EvidenceNodeType* iterator = list->head;
+    if (iterator == NULL) { //
+        printf("Removing evidence error: EvidenceListType is empty!\n");
+        exit(C_ARR_ERR);
+    } else {
+        while(iterator->next != NULL) {
+            if (iterator->next->evidence == evidence) {
+                EvidenceNodeType* delNode = iterator->next;
+                free(delNode);
+                iterator->next = iterator->next->next;
+                break;
+            }
+            iterator = iterator->next;
+        }
+        printf("Removing evidence error: EvidenceType not in EvidenceListType!\n");
+        exit(C_ARR_ERR);
     }
 }
 
@@ -125,6 +149,38 @@ void createEvidence(GhostType* ghost, EvidenceType* evidence) {
     evidence->evidenceClass = evidenceClass;
 }
 
+//  Function: isGhostlyVal
+//        in: Pointer to evidence to evalute
+//   Purpose: Determine if the evidence's value is within the "ghostly" range
+int isGhostlyVal(EvidenceType* evidence) {
+    // Determining validity of evidence value based on evidence type
+    switch (evidence->evidenceClass) {
+    case EMF:
+        if (evidence->value > 4.9 && evidence->value <= 5) {
+            return(C_TRUE);
+        }
+        return(C_FALSE);
+
+    case TEMPERATURE:
+        if (evidence->value >= -10 && evidence->value < 0) {
+            return (C_TRUE);
+        }
+        return (C_FALSE);
+
+    case FINGERPRINTS:
+        if (evidence->value == 1) {
+            return (C_TRUE);
+        }
+        return (C_FALSE);
+
+    case SOUND:
+        if (evidence->value > 70 && evidence->value <= 75) {
+            return (C_TRUE);
+        }
+        return (C_FALSE);
+    }
+}
+
 //  Function: getEMF
 //     in/ou: Pointer to float used to return the value
 //   Purpose: Return a randomly generated EMF value
@@ -145,8 +201,9 @@ void getTemperature(float* value) {
 //     in/ou: Pointer to float used to return the value
 //   Purpose: Return a randomly generated fingerprint value
 void getFingerprints(float* value) {
-    float val = randFloat(0, 2);
-    *value = val;
+    int val = randInt(0, 2);
+    float floatVal = (float) val;
+    *value = floatVal;
 }
 
 //  Function: getSound

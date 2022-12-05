@@ -23,8 +23,8 @@ void initGhost(int bored, GhostClassType gt, GhostType **ghost) {
 //    Purpose:  Check if there is a hunter in the same room as given ghost
 int hunterInRoom(GhostType *ghost) {
     if (ghost->room->hunterCount > 0)
-        return 1;
-    return 0;
+        return C_TRUE;
+    return C_FALSE;
 }
 
 //  Function: leaveEvidence
@@ -32,7 +32,7 @@ int hunterInRoom(GhostType *ghost) {
 //       out: Modified room that the ghost is in
 //   Purpose: Check if current room is available, if so create evidence and leave it in room
 void leaveEvidence(GhostType* ghost) {
-    
+    printf("Ghost left evidence\n");
     // Check if current room is available for modification
     if (sem_trywait(&(ghost->room->mutex)) == 0) {
         
@@ -54,7 +54,7 @@ void leaveEvidence(GhostType* ghost) {
 //   Function:  makeMove
 //      in/ou:  Location of GhostType
 //    Purpose:  Trys to move ghost to a random connected room, if rooms are locked, skips turn
-void makeMove(GhostType* ghost) {
+void moveGhost(GhostType* ghost) {
     
     // Check if current room is available for modification
     if (sem_trywait(&(ghost->room->mutex)) == 0) {
@@ -70,8 +70,11 @@ void makeMove(GhostType* ghost) {
         // Check if current room is available for modification
         if (sem_trywait(&(newRoom->mutex)) == 0) {
             //Move ghost to new room
+            currentRoom->ghost = NULL;
             newRoom->ghost = ghost;
             ghost->room = newRoom;
+
+            printf("Ghost moved to %s\n", newRoom->name);
 
             //Unlocking new room
             sem_post(&(newRoom->mutex));
@@ -83,7 +86,7 @@ void makeMove(GhostType* ghost) {
 }
 
 //   Function:  startGhost
-//      in/ou:  Location of building ghost is in
+//      in/ou:  Location of GhostType
 //    Purpose:  Ghost thread start function
 void *startGhost(void *g) {
 
@@ -92,10 +95,13 @@ void *startGhost(void *g) {
     //Main loop
     while (C_TRUE) {
         
+        //printf("Ghost boredom: %d\n", ghost->boredom);
+
         //Check if ghost is in room with hunter
-        if (hunterInRoom(ghost) == 1) {
+        if (hunterInRoom(ghost) == C_TRUE) {
             
             //Resetting boredom counter
+            printf("Ghost and hunter in same room!!\n");
             ghost->boredom = BOREDOM_MAX;
 
             //Choose to leave evidence (randInt == 0) or do nothing
@@ -103,15 +109,11 @@ void *startGhost(void *g) {
                 leaveEvidence(ghost);
             }
 
-            //Sleep
-            usleep(USLEEP_TIME);
-
-
         //Ghost is alone in room
         } else {
 
             //Decreasing boredom counter
-            ghost->boredom -= 1;
+            ghost->boredom--;
 
             //Checking if ghost is bored
             if (ghost->boredom <= 0) {
@@ -128,13 +130,11 @@ void *startGhost(void *g) {
 
             //Move to an adjacent room
             } else if (rand == 1) {
-                makeMove(ghost);
+                moveGhost(ghost);
             }
-                
-            //Sleep
-            usleep(USLEEP_TIME);
         }  
 
-        printf("Ghost boredom: %d\n", ghost->boredom);
+        //Sleep
+        usleep(USLEEP_TIME);
     }
 }

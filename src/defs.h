@@ -14,7 +14,6 @@
 #define C_ARR_ERR -3
 #define C_ARR_FULL -2
 #define C_MEM_ERR -1
-#define C_OK 0
 #define MAX_STR 64
 #define FEAR_RATE 1
 #define MAX_FEAR 100
@@ -79,6 +78,8 @@ typedef struct HunterType {
     EvidenceListType* evidenceList;
     char name[MAX_STR];
     int fear;
+    int boredom;
+    sem_t mutex;
 } HunterType;
 
 typedef struct BuildingType {
@@ -99,12 +100,18 @@ void appendRoom(RoomListType*, RoomNodeType*);
 void connectRooms(RoomType*, RoomType*);
 void addHunter(RoomType*, HunterType*);
 void removeHunter(RoomType*, HunterType*);
+int checkIfFoundGhost(HunterType*);
 void cleanupRoom(RoomType*);
+void getEvidence(HunterType*);
+void communicateEvidence(HunterType*);
+void initEvidenceList(EvidenceListType*);
 
 void initGhost(int, GhostClassType, GhostType**);
 void *startGhost(void*);
+void *startHunter(void*);
 void leaveEvidence(GhostType*);
 void cleanupGhost(GhostType*);
+int ghostInRoom(HunterType*);
 
 void initBuilding(BuildingType*);
 void printResults(BuildingType*);
@@ -112,15 +119,17 @@ void printResults(BuildingType*);
 void initEvidence(EvidenceType**);
 void createEvidence(GhostType*, EvidenceType*);
 void appendEvidence(EvidenceListType*, EvidenceType*);
+void removeEvidence(EvidenceListType*, EvidenceType*);
 void getEMF(float*);
 void getTemperature(float*);
 void getSound(float*);
 void getFingerprints(float*);
+int isGhostlyVal(EvidenceType*);
 
 void getHunterNames(char**);
 void initHunters(pthread_t*);
-void createInitHunters(HunterType*, char**);
-void createHunterThreads(pthread_t** hunterThreads);
+void createInitHunters(HunterType**, char**);
+void createHunterThreads(pthread_t**);
 void placeGhostRandRoom(GhostType*, BuildingType*);
 
 void cleanupBuilding(BuildingType*);

@@ -4,38 +4,38 @@ int main(int argc, char* argv[]) {
     // Initialize a random seed for the random number generators
     srand(time(NULL));
 
-    // // Creating array of hunter names
-    // char* names[MAX_HUNTERS];
+    // Creating array of hunter names
+    char* names[MAX_HUNTERS];
 
-    // // Getting names from user
-    // printf("Ghost and hunters simulation!");
-    // getHunterNames(names);
+    // Getting names from user
+    printf("Ghost and hunters simulation!");
+    getHunterNames(names);
 
     // Creating building, initilizing it, and populating it with rooms
     BuildingType building;
     initBuilding(&building);
     populateRooms(&building);
 
-    // // Creating and initlizing hunters
-    // HunterType* hunters[MAX_HUNTERS];
-    // createInitHunters(hunters, names);
+    // Creating and initlizing hunters
+    HunterType* hunters[MAX_HUNTERS];
+    createInitHunters(hunters, names);
 
     // Creating and initializing ghost
     GhostType* ghost;
     int ghostClass = randInt(0, 4);
     initGhost(BOREDOM_MAX, ghostClass, &ghost);
 
-    // // Placing hunters into the van
-    // for (int i = 0; i < MAX_HUNTERS; i++) {
-    //     addHunter(building.rooms->head, hunters[i]);
-    // }
+    // Placing hunters into the van
+    for (int i = 0; i < MAX_HUNTERS; i++) {
+        addHunter(building.rooms.head->room, hunters[i]);
+    }
     
     // Placing ghost in random room (other than van)
     placeGhostRandRoom(ghost, &building);
 
-    // // Creating and initilizing hunter threads
-    // pthread_t* hunterThreads[MAX_HUNTERS];
-    // createHunterThreads(hunters);
+    // Creating and initilizing hunter threads
+    pthread_t* hunterThreads[MAX_HUNTERS];
+    createHunterThreads(hunterThreads);
 
     // Creating ghost thread
     pthread_t ghostThread;
@@ -43,19 +43,19 @@ int main(int argc, char* argv[]) {
     // Running threads
     pthread_create(&ghostThread, NULL, startGhost, ghost);
 
-    // for (int i = 0; i < MAX_HUNTERS; i++) {
-    //     pthread_create(hunterThreads[i], NULL, startHunter, hunters[i]);
-    // }
+    for (int i = 0; i < MAX_HUNTERS; i++) {
+        pthread_create(hunterThreads[i], NULL, startHunter, hunters[i]);
+    }
 
     // Waiting on threads
     pthread_join(ghostThread, NULL);
 
-    // for (int i = 0; i < MAX_HUNTERS; i++) {
-    //     pthread_join(*hunterThreads[i], NULL);
-    // }
+    for (int i = 0; i < MAX_HUNTERS; i++) {
+        pthread_join(*hunterThreads[i], NULL);
+    }
 
-    // //Printing results of simulation
-    // printResults(&building);
+    //Printing results of simulation
+    //printResults(&building);
 
     // // Freeing memory
     // cleanupBuilding(&building);

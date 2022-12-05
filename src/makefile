@@ -1,10 +1,11 @@
 CC = gcc
 LIB = -lpthread -lm
 OBJ = building evidence ghost hunter main room
+OBJ1 = building.c evidence.c ghost.c hunter.c main.c room.c
 OBJ2 = building.o evidence.o ghost.o hunter.o main.o room.o
 
 all:
-	$(CC) -o final building.c evidence.c ghost.c hunter.c main.c room.c $(LIB) -g
+	$(CC) -o final $(OBJ1) $(LIB) -g
 
 building: building.c
 	$(CC) building.c -c building $(LIB)
@@ -25,4 +26,4 @@ room: room.c
 	$(CC) room.c -c room $(LIB)
 
 clean:
-	rm -f *.o *.d $(OBJ) $(OBJ2)
+	rm -f *.o *.d $(OBJ)
