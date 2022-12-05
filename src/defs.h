@@ -101,6 +101,7 @@ void removeHunter(RoomType*, HunterType*);
 void cleanupRoom(RoomType*);
 
 void initGhost(int, GhostClassType, GhostType**);
+void leaveEvidence(GhostType*);
 void cleanupGhost(GhostType*);
 
 void initBuilding(BuildingType*);

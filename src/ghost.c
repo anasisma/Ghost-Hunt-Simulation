@@ -27,27 +27,58 @@ int hunterInRoom(GhostType *ghost) {
     return 0;
 }
 
-// Function: makeMove
+//  Function: leaveEvidence
+//        in: Pointer to ghost that will be leaving the evidence
+//       out: Modified room that the ghost is in
+//   Purpose: Check if current room is available, if so create evidence and leave it in room
+void leaveEvidence(GhostType* ghost) {
+    
+    // Check if current room is available for modification
+    if (sem_trywait(&(ghost->room->mutex)) == 0) {
+        
+        //Initalizing new evidence
+        EvidenceType* evidence;
+        initEvidence(evidence);
+
+        //Creating evidence based on ghost
+        createEvidence(ghost, evidence);
+
+        //Adding evidence to current room
+        appendEvidence(ghost->room->evidenceList, evidence);
+
+        //Unlocking current room
+        sem_post(&(currentRoom->mutex));
+    }
+}
+
+//   Function:  makeMove
+//      in/ou:  Location of GhostType
+//    Purpose:  Trys to move ghost to a random connected room, if rooms are locked, skips turn
 void makeMove(GhostType* ghost) {
     
-    // If the hunter's room is available for modification, lock it
-    if (sem_trywait(&(current_room->mutex)) == 0) {
-        // If the new room is *not* available for modification, unlock the hunter's room and return nothing
-        if (sem_trywait(&(next_room->mutex)) != 0) {
-            // We must remember to unlock the locked current room
-            sem_post(&(current_room->mutex));
-            return;
-        }
-    }
-
-    sem_trywait(&(ghost->room->mutex)) {
+    // Check if current room is available for modification
+    if (sem_trywait(&(ghost->room->mutex)) == 0) {
+        // Get a random connected room to move to
         int nextRoom = randInt(0, ghost->room->connectedRooms.roomCount);
         RoomNodeType iterator = ghost->room->connectedRooms.head;
         for (int i = 0; i < nextRoom; i++) {
             iterator = iterator->next;
         }
-        iterator->ghost = ghost;
-        ghost->room = iterator;
+        RoomType* newRoom = iterator->room;
+        RoomType* currentRoom = ghost->room;
+
+        // Check if current room is available for modification
+        if (sem_trywait(&(newRoom->mutex)) == 0) {
+            //Move ghost to new room
+            newRoom->ghost = ghost;
+            ghost->room = newRoom;
+
+            //Unlocking new room
+            sem_post(&(newRoom->mutex));
+        }
+
+        //Unlocking current room
+        sem_post(&(currentRoom->mutex));
     }
 }
 
@@ -70,7 +101,7 @@ void *startGhost(void *b) {
 
             //Choose to leave evidence (randInt == 0) or do nothing
             if (randInt(0, 5) == 0) {
-                leaveEvidence();
+                leaveEvidence(ghost);
             }
 
             //Sleep

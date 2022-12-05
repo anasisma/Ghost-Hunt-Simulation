@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 
     // Creating and initlizing hunters
     HunterType* hunters[MAX_HUNTERS];
-    createHunters(hunters);
+    createInitHunters(hunters);
 
     // Creating and initializing ghost
     GhostType* ghost;
@@ -82,18 +82,8 @@ void placeGhostRandRoom(GhostType* ghost, BuildingType* building) {
     for (int i = 0; i < roomNum; i++) {
         iterator = iterator->next;
     }
-    iterator->ghost = ghost;
-}
-
-//  Function: createInitHunters
-//     in/ou: Pointer to array of HunterType pointers
-//   Purpose: Creates and initilizes HunterTypes and stores them in given array
-void createInitHunters(HunterType* hunters) {
-    for (int i = 0; i < MAX_HUNTERS; i++) {
-        HunterType* hunter;
-        initHunter(hunter);
-        hunters[i] = hunter;
-    }
+    iterator->room->ghost = ghost;
+    ghost->room = iterator->room;
 }
 
 //  Function: createHunterThreads

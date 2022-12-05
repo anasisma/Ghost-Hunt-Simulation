@@ -1,16 +1,30 @@
 #include "defs.h"
 
-void initHunter(HunterType* hunter) {
+void initHunter(HunterType** hunter) {
 
-    hunter = (HunterType*)malloc(sizeof(HunterType));
+    HunterType* newHunter = (HunterType*)malloc(sizeof(HunterType));
 
-        // Checking if hunter was allocated correctly
-        if (hunter == NULL) {
-            printf("Memory allocation error: couldn't malloc new hunter!\n");
-            exit(C_MEM_ERR);
-        }
+    // Checking if hunter was allocated correctly
+    if (newHunter == NULL) {
+        printf("Memory allocation error: couldn't malloc new hunter!\n");
+        exit(C_MEM_ERR);
+    }
+
+    *hunter = newHunter;  
 }
 
+//  Function: createInitHunters
+//     in/ou: Pointer to array of HunterType pointers
+//   Purpose: Creates and initilizes HunterTypes and stores them in given array
+void createInitHunters(HunterType* hunters) {
+    for (int i = 0; i < MAX_HUNTERS; i++) {
+        HunterType* hunter;
+        initHunter(hunter);
+        int class = randInt(0, 4);
+        hunter->evidenceClass = class;
+        hunters[i] = hunter;
+    }
+}
 
 //   Function:  startHunter
 //         in/ou:  Location of building hunter is in

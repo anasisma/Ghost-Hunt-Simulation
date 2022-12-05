@@ -22,6 +22,37 @@ void initRoom(RoomType *room, char *name) {
     room->ghost = NULL;
 }
 
+//  Function:  appendEvidence
+//     in/ou:  Location of EvidenceListType to append new room to
+//        in:  Location of EvidenceType to append to list
+//   Purpose:  Adds EvidenceType to tail of the given EvidenceListType
+void appendEvidence(EvidenceListType* list, EvidenceType* evidence) {
+
+    // Allocating memory for new EvidenceNodeType
+    EvidenceNodeType* newEvidenceNode = (EvidenceNodeType *)malloc(sizeof(EvidenceNodeType));
+
+    // Checking for memory allocation error
+    if (newEvidenceNode == NULL) {
+        printf("Memory allocation error: couldn't malloc new EvidenceNodeType!\n");
+        exit(C_MEM_ERR);
+    }
+
+    // Setting attributes of newEvidenceNode
+    newEvidenceNode->evidence = evidence;
+    newEvidenceNode->next = NULL;
+
+    // If list is empty, both head and tail need to point to new node
+    if (list->head == NULL) {
+        list->head = newEvidenceNode;
+        list->tail = newEvidenceNode;
+
+        // Otherwise add node after the tail
+    } else {
+        list->tail->next = newEvidenceNode;
+        list->tail = newEvidenceNode;
+    }
+}
+
 //  Function:  appendRoom
 //     in/ou:  Location of RoomListType to append new room to
 //        in:  Location of RoomType to append to list
