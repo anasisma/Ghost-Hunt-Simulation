@@ -46,6 +46,11 @@ typedef struct EvidenceList {
     EvidenceNodeType* tail;
 } EvidenceListType;
 
+typedef struct Evidence {
+    float value;
+    EvidenceClassType evidenceClass;
+} EvidenceType;
+
 typedef struct RoomNode {
     struct RoomNode* next;
     RoomType* room;
