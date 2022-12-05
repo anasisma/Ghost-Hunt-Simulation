@@ -31,27 +31,27 @@ typedef enum { POLTERGEIST,
                BULLIES,
                PHANTOM } GhostClassType;
 
-typedef struct Evidence {
+typedef struct EvidenceType {
     float value;
     EvidenceClassType evidenceClass;
 } EvidenceType;
 
-typedef struct EvidenceNode {
-    struct EvidenceNode* next;
+typedef struct EvidenceNodeType {
+    struct EvidenceNodeType* next;
     EvidenceType* evidence;
 } EvidenceNodeType;
 
-typedef struct EvidenceList {
+typedef struct EvidenceListType {
     EvidenceNodeType* head;
     EvidenceNodeType* tail;
 } EvidenceListType;
 
-typedef struct RoomNode {
-    struct RoomNode* next;
+typedef struct RoomNodeType {
+    struct RoomNodeType* next;
     struct RoomType* room;
 } RoomNodeType;
 
-typedef struct RoomList {
+typedef struct RoomListType {
     RoomNodeType* head;
     RoomNodeType* tail;
     int roomCount;
@@ -81,7 +81,7 @@ typedef struct HunterType {
     int fear;
 } HunterType;
 
-typedef struct Building {
+typedef struct BuildingType {
     GhostType* ghost;
     RoomListType rooms;
     HunterType* hunters[MAX_HUNTERS];
@@ -120,7 +120,7 @@ void getFingerprints(float*);
 void getHunterNames(char**);
 void initHunters(pthread_t*);
 void createInitHunters(HunterType*, char**);
-void createHunterThreads(pthread_t**);
+void createHunterThreads(pthread_t** hunterThreads);
 void placeGhostRandRoom(GhostType*, BuildingType*);
 
 void cleanupBuilding(BuildingType*);
