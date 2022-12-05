@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 
     // Creating and initlizing hunters
     HunterType* hunters[MAX_HUNTERS];
-    createInitHunters(hunters);
+    createInitHunters(hunters, names);
 
     // Creating and initializing ghost
     GhostType* ghost;

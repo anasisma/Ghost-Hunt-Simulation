@@ -22,6 +22,20 @@
 #define USLEEP_TIME 50000
 #define BOREDOM_MAX 99
 
+typedef struct Ghost {
+    int boredom;
+    GhostClassType ghostClass;
+    RoomType* room;
+} GhostType;
+
+typedef struct Hunter {
+    RoomType* room;
+    EvidenceClassType evidenceClass;
+    EvidenceListType* evidenceList;
+    char name[MAX_STR];
+    int fear;
+} HunterType;
+
 typedef struct EvidenceNode {
     struct EvidenceNode* next;
     EvidenceType* evidence;
@@ -59,25 +73,6 @@ typedef struct Room {
     sem_t mutex;
 } RoomType;
 
-typedef struct Ghost {
-    int boredom;
-    GhostClassType ghostClass;
-    RoomType* room;
-} GhostType;
-
-typedef struct Hunter {
-    RoomType* room;
-    EvidenceClassType evidenceClass;
-    EvidenceListType* evidenceList;
-    char name[MAX_STR];
-    int fear;
-} HunterType;
-
-typedef struct Evidence {
-    float value;
-    EvidenceClassType evidenceClass;
-} EvidenceType;
-
 typedef enum { EMF,
                TEMPERATURE,
                FINGERPRINTS,
@@ -109,7 +104,7 @@ void printResults(BuildingType*);
 
 void getHunterNames(char**);
 void initHunters(pthread_t*);
-void createInitHunters(HunterType*);
+void createInitHunters(HunterType*, char**);
 void createHunterThreads(pthread_t* hunterThreads);
 void placeGhostRandRoom(GhostType*, BuildingType*);
 

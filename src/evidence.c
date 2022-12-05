@@ -12,7 +12,49 @@ void initEvidence(EvidenceType **evidence) {
         exit(C_MEM_ERR);
     }
     
+    newEvid->value = NULL;
+    newEvid->evidenceClass = NULL;
+
     *evidence = newEvid;  // return this new structure using the evidence parameter
+}
+
+/*   Function:  initEvidenceList                                        */
+/*         in:  Location of EvidenceListType to be modified            */
+/*        out:  Modified EvidenceListType                               */
+/*    Purpose:  initializes both fields of the given list parameter to default values      */
+void initEvidenceList(GhostListType* list) {
+    list->head = NULL;
+    list->tail = NULL;  // set both head and tail (list starts as empty)
+}
+
+//  Function:  appendEvidence
+//     in/ou:  Location of EvidenceListType to append new room to
+//        in:  Location of EvidenceType to append to list
+//   Purpose:  Adds EvidenceType to tail of the given EvidenceListType
+void appendEvidence(EvidenceListType* list, EvidenceType* evidence) {
+    // Allocating memory for new EvidenceNodeType
+    EvidenceNodeType* newEvidenceNode = (EvidenceNodeType*)malloc(sizeof(EvidenceNodeType));
+
+    // Checking for memory allocation error
+    if (newEvidenceNode == NULL) {
+        printf("Memory allocation error: couldn't malloc new EvidenceNodeType!\n");
+        exit(C_MEM_ERR);
+    }
+
+    // Setting attributes of newEvidenceNode
+    newEvidenceNode->evidence = evidence;
+    newEvidenceNode->next = NULL;
+
+    // If list is empty, both head and tail need to point to new node
+    if (list->head == NULL) {
+        list->head = newEvidenceNode;
+        list->tail = newEvidenceNode;
+
+        // Otherwise add node after the tail
+    } else {
+        list->tail->next = newEvidenceNode;
+        list->tail = newEvidenceNode;
+    }
 }
 
 //   Function:  createEvidence

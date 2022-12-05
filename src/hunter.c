@@ -10,18 +10,20 @@ void initHunter(HunterType** hunter) {
         exit(C_MEM_ERR);
     }
 
+    newHunter->room = NULL;
     *hunter = newHunter;  
 }
 
 //  Function: createInitHunters
 //     in/ou: Pointer to array of HunterType pointers
 //   Purpose: Creates and initilizes HunterTypes and stores them in given array
-void createInitHunters(HunterType* hunters) {
+void createInitHunters(HunterType* hunters, char** names) {
     for (int i = 0; i < MAX_HUNTERS; i++) {
         HunterType* hunter;
         initHunter(hunter);
         int class = randInt(0, 4);
         hunter->evidenceClass = class;
+        strcpy(hunter->name, names[i]);
         hunters[i] = hunter;
     }
 }

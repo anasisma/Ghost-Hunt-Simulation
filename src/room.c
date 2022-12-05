@@ -19,67 +19,37 @@ void initRoom(RoomType *room, char *name) {
 
     // Initilizing attributes
     strcpy(room->name, name);
+    room->hunterCount = 0;
     room->ghost = NULL;
 }
 
-//  Function:  appendEvidence
-//     in/ou:  Location of EvidenceListType to append new room to
-//        in:  Location of EvidenceType to append to list
-//   Purpose:  Adds EvidenceType to tail of the given EvidenceListType
-void appendEvidence(EvidenceListType* list, EvidenceType* evidence) {
-
-    // Allocating memory for new EvidenceNodeType
-    EvidenceNodeType* newEvidenceNode = (EvidenceNodeType *)malloc(sizeof(EvidenceNodeType));
-
-    // Checking for memory allocation error
-    if (newEvidenceNode == NULL) {
-        printf("Memory allocation error: couldn't malloc new EvidenceNodeType!\n");
-        exit(C_MEM_ERR);
-    }
-
-    // Setting attributes of newEvidenceNode
-    newEvidenceNode->evidence = evidence;
-    newEvidenceNode->next = NULL;
-
-    // If list is empty, both head and tail need to point to new node
-    if (list->head == NULL) {
-        list->head = newEvidenceNode;
-        list->tail = newEvidenceNode;
-
-        // Otherwise add node after the tail
-    } else {
-        list->tail->next = newEvidenceNode;
-        list->tail = newEvidenceNode;
-    }
+/*   Function:  initRoomList                                        */
+/*         in:  Location of RoomListType to be modified            */
+/*        out:  Modified RoomListType                               */
+/*    Purpose:  initializes both fields of the given list parameter to default values      */
+void initRoomList(RoomListType *list) {
+    list->head = NULL;
+    list->tail = NULL;  // set both head and tail (list starts as empty)
+    list->roomCount = 0;
 }
 
 //  Function:  appendRoom
 //     in/ou:  Location of RoomListType to append new room to
-//        in:  Location of RoomType to append to list
-//   Purpose:  Adds RoomType to tail of the given RoomListType
-void appendRoom(RoomListType *list, RoomType *room) {
-    // Allocating memory for new RoomNodeType
-    RoomNodeType *newRoomNode = (RoomNodeType *)malloc(sizeof(RoomNodeType));
-
-    // Checking for memory allocation error
-    if (newRoomNode == NULL) {
-        printf("Memory allocation error: couldn't malloc new RoomNodeType!\n");
-        exit(C_MEM_ERR);
-    }
-
-    // Setting attributes of RoomNodeType
-    newRoomNode->room = room;
-    newRoomNode->next = NULL;
+//        in:  Location of RoomNodeType to append to list
+//   Purpose:  Adds RoomNodeType to tail of the given RoomListType
+void appendRoom(RoomListType *list, RoomNodeType *roomNode) {
+    
+    roomNode->next = NULL;
 
     // If list is empty, both head and tail need to point to new node
     if (list->head == NULL) {
-        list->head = newRoomNode;
-        list->tail = newRoomNode;
+        list->head = roomNode;
+        list->tail = roomNode;
 
         // Otherwise add node after the tail
     } else {
-        list->tail->next = newRoomNode;
-        list->tail = newRoomNode;
+        list->tail->next = roomNode;
+        list->tail = roomNode;
     }
     list->roomCount++;
 }
