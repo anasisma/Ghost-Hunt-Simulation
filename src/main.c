@@ -20,6 +20,11 @@ int main(int argc, char* argv[]) {
     HunterType* hunters[MAX_HUNTERS];
     createInitHunters(hunters, names);
 
+    // Placing hunters into the building's hunter array
+    for (int i = 0; i < MAX_HUNTERS; i++) {
+        building.hunters[i] = hunters[i];
+    }
+
     // Creating and initializing ghost
     GhostType* ghost;
     int ghostClass = randInt(0, 4);
@@ -29,7 +34,7 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < MAX_HUNTERS; i++) {
         addHunter(building.rooms.head->room, hunters[i]);
     }
-    
+
     // Placing ghost in random room (other than van)
     placeGhostRandRoom(ghost, &building);
 
@@ -54,8 +59,8 @@ int main(int argc, char* argv[]) {
         pthread_join(*hunterThreads[i], NULL);
     }
 
-    //Printing results of simulation
-    //printResults(&building);
+    // Printing results of simulation
+    printResults(&building);
 
     // // Freeing memory
     // cleanupBuilding(&building);
@@ -130,7 +135,70 @@ void getHunterNames(char** names) {
 //   Purpose: Prints the results of a completed simulation in a given building
 //  Comments: Assumes function is only called on a building whose simulation has ended
 void printResults(BuildingType* building) {
+    printf("All done! Let's tally the results:\n");
+    for (int i = 0; i < MAX_HUNTERS; i++) {
+        printHunterResult(building->hunters[i]);
+    }
+    for (int i = 0; i < MAX_HUNTERS; i++) {
+        if (building->hunters[i]->suspicious) {
+            printSuspicions(building->hunters[i]);
+            break;
+        }
+    }
+}
 
+//  Function: printHunterResult
+//        in: Pointer to hunter to print
+//   Purpose: Prints the hunt results of a singular hunter
+void printHunterResult(HunterType* hunter) {
+    printf("            * %s ", hunter->name);
+    if (hunter->fear >= 100) {
+        printf("has run away in fear!\n");
+    } else if (hunter->boredom <= 0) {
+        printf("has run out of things to do!\n");
+    } else {
+        printf("uncovered the ghost!\n");
+    }
+}
+
+void printSuspicions(HunterType* hunter) {
+    printf("Here is the evidence that was used to uncover the ghost: \n");
+    EvidenceNodeType* i = hunter->evidenceList->head;
+    int emfs = 0, temps = 0, fngrprnts = 0, sounds = 0;
+    while (i != NULL) {
+        if (isGhostlyVal(i->evidence)) {
+            switch (i->evidence->evidenceClass) {
+                case EMF:
+                    // printf("    * EMF with a value of %f\n", i->evidence->value);
+                    emfs++;
+                    break;
+
+                case TEMPERATURE:
+                    // printf("    * Temperature with a value of %f°C\n", i->evidence->value);
+                    temps++;
+                    break;
+
+                case FINGERPRINTS:
+                    // printf("    * Fingerprints with a value of %f\n", i->evidence->value);
+                    fngrprnts++;
+                    break;
+
+                case SOUND:
+                    // printf("    * Sound with a value of %f dB\n", i->evidence->value);
+                    sounds++;
+                    break;
+            }
+        }
+        i = i->next;
+    }
+    if(emfs > 0)
+        printf("    * %d high EMF values\n", emfs);
+    if (temps > 0)
+        printf("    * %d low temperatures\n", temps);
+    if (fngrprnts > 0)
+        printf("    * %d sets of paranormal fingerprints\n", fngrprnts);
+    if (sounds > 0)
+        printf("    * %d loud sounds\n", sounds);
 }
 
 /*

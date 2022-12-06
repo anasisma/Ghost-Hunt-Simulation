@@ -32,7 +32,6 @@ int hunterInRoom(GhostType* ghost) {
 //       out: Modified room that the ghost is in
 //   Purpose: Check if current room is available, if so create evidence and leave it in room
 void leaveEvidence(GhostType* ghost) {
-    printf("Ghost left evidence\n");
     // Check if current room is available for modification
     if (sem_trywait(&(ghost->room->mutex)) == 0) {
         // Initalizing new evidence
@@ -100,7 +99,7 @@ void* startGhost(void* g) {
             for (int i = 0; i < ghost->room->hunterCount; i++) {
                 printf("hunter %s, ", ghost->room->hunters[i]->name);
             }
-            printf("in %s!\n ", ghost->room->name);
+            printf("in %s!\n", ghost->room->name);
 
             ghost->boredom = BOREDOM_MAX;
 

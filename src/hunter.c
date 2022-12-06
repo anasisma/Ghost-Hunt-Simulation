@@ -15,9 +15,10 @@ void initHunter(HunterType** hunter) {
         exit(C_SEM_ERR);
     }
 
-    EvidenceListType* list = (EvidenceListType*) malloc(sizeof(EvidenceListType));
+    EvidenceListType* list = (EvidenceListType*)malloc(sizeof(EvidenceListType));
     initEvidenceList(list);
 
+    newHunter->suspicious = C_FALSE;
     newHunter->evidenceList = list;
     newHunter->room = NULL;
     newHunter->boredom = BOREDOM_MAX;
@@ -30,12 +31,11 @@ void initHunter(HunterType** hunter) {
 //   Purpose: Creates and initializes HunterTypes and stores them in given array
 void createInitHunters(HunterType** hunters, char** names) {
     for (int i = 0; i < MAX_HUNTERS; i++) {
-        HunterType* hunter; // Temp hunter struct used to assign values
-        initHunter(&hunter); // Initialize the temp struct
-        int class = randInt(0, 4); // Random int to determine which device hunter will have
-        hunter->evidenceClass = class; // Assign the random int to the hunter
-        strcpy(hunter->name, names[i]); // Copy the name to the hunter
-        hunters[i] = hunter; // Assign this hunter struct to the array of hunters
+        HunterType* hunter;              // Temp hunter struct used to assign values
+        initHunter(&hunter);             // Initialize the temp struct
+        hunter->evidenceClass = i;       // Each hunter will have a unique device
+        strcpy(hunter->name, names[i]);  // Copy the name to the hunter
+        hunters[i] = hunter;             // Assign this hunter struct to the array of hunters
     }
 }
 
@@ -82,29 +82,41 @@ void getEvidence(HunterType* hunter) {
 
     // Check if current room is available for modification
     if (sem_trywait(&(hunter->room->mutex)) == 0) {
-
-        //Creating temporary node pointer
+        // Creating temporary node pointer
         EvidenceNodeType* currNode;
         currNode = hunter->room->evidenceList.head;
 
-        //Looping through list
+        // Looping through list
         while (currNode != NULL) {
-            //printf("Hunter %s is in room %s and sees evidence %p\n", hunter->name, hunter->room->name, currNode->evidence);
-            //printf("Hunter %s is in room %s and sees evidence of type %d with value: %f\n", hunter->name, hunter->room->name, currNode->evidence->evidenceClass, currNode->evidence->value);
-            //Checking if currNode has evidence hunter can pick up
+            // Checking if currNode has evidence hunter can pick up
             if (currNode->evidence->evidenceClass == hunter->evidenceClass) {
-
+                evidFound = C_TRUE;
+                // append evidence to hunter's list and remove it from room's list
                 appendEvidence(hunter->evidenceList, currNode->evidence);
-                printf("Thing to remove: %p\n", currNode->evidence);
                 removeEvidence(&(hunter->room->evidenceList), currNode->evidence);
-                break;
+                hunter->boredom = BOREDOM_MAX;  // reset hunter's boredom since they found ghostly evidence
+                break;                          // break to immediately exit the loop, to not add more evidence
             }
 
             currNode = currNode->next;
         }
+
+        if (!evidFound) {
+            // Initalizing new evidence
+            EvidenceType* evidence;
+            initEvidence(&evidence);
+
+            // Creating evidence based on hunter's device type
+            createStdEvidence(hunter, evidence);
+
+            // Adding evidence to hunter's list
+            appendEvidence(hunter->evidenceList, evidence);
+        }
+
         // Unlocking current room
         sem_post(&(hunter->room->mutex));
     }
+    // printf("Hunter %s has collected some evidence\n", hunter->name);
 }
 
 //   Function:  createStdEvidence
@@ -131,7 +143,6 @@ void createStdEvidence(HunterType* hunter, EvidenceType* evidence) {
         case SOUND:
             value = randFloat(40, 71);
             break;
-
     }
 
     // Setting evidence's attributes
@@ -157,45 +168,45 @@ void communicateEvidence(HunterType* hunter) {
         // Random int for the index of the hunter to share with
         hunterIndex = randInt(0, hunter->room->hunterCount);
         if (hunter->room->hunters[hunterIndex] == hunter)
-        // If the randomly selected hunter is the same as the actual hunter, get another value
+            // If the randomly selected hunter is the same as the actual hunter, get another value
             continue;
         break;
     }
 
-    // Waiting on fellow hunter's mutex to be available
-    sem_wait(&(hunter->room->hunters[hunterIndex]->mutex));
-    
-    // Node to iterate through hunter's evidence list
-    EvidenceNodeType* iterator = hunter->evidenceList->head;
-    while (iterator != NULL) {
-        // If the current node's value is in the ghostly range
-        if (isGhostlyVal(iterator->evidence)) {
-            
-            // Int to know if 2nd hunter already has the evidence from current node
-            int exists = C_FALSE;
+    // Check if selected hunter's evidence list is available for modification
+    if (sem_trywait(&(hunter->room->hunters[hunterIndex]->mutex)) == 0) {
+        // Node to iterate through hunter's evidence list
+        EvidenceNodeType* iterator = hunter->evidenceList->head;
+        while (iterator != NULL) {
+            // If the current node's value is in the ghostly range
+            if (isGhostlyVal(iterator->evidence)) {
+                printf("%s is trying to communicate with %s: ", hunter->name, hunter->room->hunters[hunterIndex]->name);
+                printf("Type %d with value: %f\n", iterator->evidence->evidenceClass, iterator->evidence->value);
+                // Int to know if 2nd hunter already has the evidence from current node
+                int exists = C_FALSE;
 
-            // Node to iterate through 2nd hunter's evidence list
-            EvidenceNodeType* iterator2 = hunter->room->hunters[hunterIndex]->evidenceList->head;
-            printf("%s is communicating with %s\n", hunter->name, hunter->room->hunters[hunterIndex]->name);
-            while (iterator2 != NULL) {
-
-                // If outer loop's node and this node contain the same evidence, then it exists
-                if (iterator->evidence == iterator2->evidence) {
-                    exists = C_TRUE;
+                // Node to iterate through 2nd hunter's evidence list
+                EvidenceNodeType* iterator2 = hunter->room->hunters[hunterIndex]->evidenceList->head;
+                while (iterator2 != NULL) {
+                    // If outer loop's node and this node contain the same evidence, then it exists
+                    if (iterator->evidence == iterator2->evidence) {
+                        exists = C_TRUE;
+                    }
+                    iterator2 = iterator2->next;
+                }
+                // If it doesn't exist, append it to 2nd hunter's evidence list
+                if (!exists) {
+                    printf("added %f to hunter %s list\n", iterator->evidence->value, hunter->room->hunters[hunterIndex]->name);
+                    appendEvidence(hunter->room->hunters[hunterIndex]->evidenceList, iterator->evidence);
                 }
             }
-            // If it doesn't exist, append it to 2nd hunter's evidence list
-            if (!exists) {
-                appendEvidence(hunter->room->hunters[hunterIndex]->evidenceList, iterator->evidence);
-            }
+            // Move to next node
+            iterator = iterator->next;
         }
-        // Move to next node
-        iterator = iterator->next;
+        printf("%s succesfully communicated with %s\n", hunter->name, hunter->room->hunters[hunterIndex]->name);
+        // Unlocking fellow hunter
+        sem_post(&(hunter->room->hunters[hunterIndex]->mutex));
     }
-
-    // Unlocking fellow hunter
-    sem_post(&(hunter->room->hunters[hunterIndex]->mutex));
-    
 }
 
 //   Function:  checkIfFoundGhost
@@ -211,7 +222,7 @@ int checkIfFoundGhost(HunterType* hunter) {
     // Node to iterate through hunter's evidence list
     EvidenceNodeType* iterator = hunter->evidenceList->head;
     if (iterator == NULL)
-        return C_FALSE; // If head is null, hunter has no evidence at all
+        return C_FALSE;  // If head is null, hunter has no evidence at all
     while (iterator != NULL) {
         // Determining if current evidence is ghostly
         // If evidence is ghostly then set its corresponding variable to true (C_TRUE = 1)
@@ -239,7 +250,7 @@ int checkIfFoundGhost(HunterType* hunter) {
 
         iterator = iterator->next;
     }
-    
+
     // Return true if at least 3 of the evidence types were found by hunter
     if ((emfFound + tempFound + soundFound + fingerFound) >= 3)
         return C_TRUE;
@@ -258,12 +269,11 @@ void* startHunter(void* h) {
     // Main loop
     while (C_TRUE) {
         printf("Hunter %s has a boredom of %d and fear of %d\n", hunter->name, hunter->boredom, hunter->fear);
-        
+
         // Check if hunter is in a room with a ghost
         if (ghostInRoom(hunter) == C_TRUE) {
             // Increasing hunter's fear and resetting boredome
             hunter->fear += FEAR_RATE;
-            hunter->boredom = BOREDOM_MAX;
 
             // Checking if hunter fear is too high
             if (hunter->fear >= MAX_FEAR) {
@@ -281,29 +291,30 @@ void* startHunter(void* h) {
             // Checking if hunter is bored
             if (hunter->boredom <= 0) {
                 // Ending this thread by breaking main loop
-                printf("%s is leaving because he is too bored\n", hunter->name); 
+                printf("%s is leaving because he is too bored\n", hunter->name);
                 removeHunter(hunter->room, hunter);
                 break;
             }
         }
 
         // Choose next action
-        int rand = randInt(0, 5);
+        int rand = randInt(0, 10);
 
         // Check if hunter is alone
         if (hunter->room->hunterCount > 1 && hunter->evidenceList->head != NULL) {
-            // If hunter is with other hunters, 30% to communicate, 10% to move, 10% to get evidence
-            if (rand < 2) {
-                //communicateEvidence(hunter);
-            } else if (rand == 2) {
+            // If hunter is with other hunters, 30% to communicate, 50% to move, 20% to get evidence
+            if (rand < 3) {
+                printf("Hunter %s will communicate ----------------------------------------------------------------\n", hunter->name);
+                communicateEvidence(hunter);
+            } else if (rand == 3 || rand == 4) {
                 getEvidence(hunter);
             } else {
                 moveHunter(hunter);
             }
 
-            // If hunter is alone in room, 20% to move and 30% to get evidence
+            // If hunter is alone in room, 80% to move and 20% to get evidence
         } else {
-            if (rand < 4) {
+            if (rand < 8) {
                 moveHunter(hunter);
             } else {
                 getEvidence(hunter);
@@ -313,12 +324,13 @@ void* startHunter(void* h) {
         // Checking if hunter found a ghost
         if (checkIfFoundGhost(hunter)) {
             // Ending this thread by breaking main loop
-            printf("%s is leaving because he found enough evidence\n", hunter->name);
+            hunter->suspicious = C_TRUE;
+            printf("%s is leaving because he found enough evidence ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||\n", hunter->name);
             removeHunter(hunter->room, hunter);
             break;
-        } 
-
-        //Sleep
+        }
+        printf("Hunter %s ended move\n", hunter->name);
+        // Sleep
         usleep(USLEEP_TIME);
     }
 }
