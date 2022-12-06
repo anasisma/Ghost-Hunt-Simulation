@@ -154,7 +154,7 @@ void printResults(BuildingType* building) {
 //        in: Pointer to hunter to print
 //   Purpose: Prints the hunt results of a singular hunter
 void printHunterResult(HunterType* hunter) {
-    printf("            * %s ", hunter->name);
+    printf("    * %s ", hunter->name);
     if (hunter->fear >= 100) {
         printf("has run away in fear!\n");
     } else if (hunter->boredom <= 0) {
@@ -172,36 +172,29 @@ void printSuspicions(HunterType* hunter) {
         if (isGhostlyVal(i->evidence)) {
             switch (i->evidence->evidenceClass) {
                 case EMF:
-                    // printf("    * EMF with a value of %f\n", i->evidence->value);
+                    printf("    *   EMF with a value of %f\n", i->evidence->value);
                     emfs++;
                     break;
 
                 case TEMPERATURE:
-                    // printf("    * Temperature with a value of %f°C\n", i->evidence->value);
+                    printf("    *   Temperature with a value of %f°C\n", i->evidence->value);
                     temps++;
                     break;
 
                 case FINGERPRINTS:
-                    // printf("    * Fingerprints with a value of %f\n", i->evidence->value);
                     fngrprnts++;
                     break;
 
                 case SOUND:
-                    // printf("    * Sound with a value of %f dB\n", i->evidence->value);
+                    printf("    *   Sound with a value of %f dB\n", i->evidence->value);
                     sounds++;
                     break;
             }
         }
         i = i->next;
     }
-    if(emfs > 0)
-        printf("    * %d high EMF values\n", emfs);
-    if (temps > 0)
-        printf("    * %d low temperatures\n", temps);
     if (fngrprnts > 0)
-        printf("    * %d sets of paranormal fingerprints\n", fngrprnts);
-    if (sounds > 0)
-        printf("    * %d loud sounds\n", sounds);
+        printf("    *   %d set(s) of paranormal fingerprints\n", fngrprnts);
 }
 
 /*

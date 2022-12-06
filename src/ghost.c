@@ -44,6 +44,13 @@ void leaveEvidence(GhostType* ghost) {
         // Adding evidence to current room
         appendEvidence(&(ghost->room->evidenceList), evidence);
 
+        //Check if evidence ghost left is standard or ghostly
+        if (isGhostlyVal(evidence)) {
+            printf("| %20s | %30s | %20s |\n", "Ghost", "left ghostly evidence", getTypeString(evidence->evidenceClass));
+        } else {
+            printf("| %20s | %30s | %20s |\n", "Ghost", "left standard evidence", getTypeString(evidence->evidenceClass));
+        }
+
         // Unlocking current room
         sem_post(&(ghost->room->mutex));
     }
@@ -71,7 +78,7 @@ void moveGhost(GhostType* ghost) {
             newRoom->ghost = ghost;
             ghost->room = newRoom;
 
-            printf("Ghost moved to %s\n", newRoom->name);
+            printf("| %20s | %30s | %20s |\n", "Ghost", "changed location to", newRoom->name);
 
             // Unlocking new room
             sem_post(&(newRoom->mutex));
@@ -90,16 +97,11 @@ void* startGhost(void* g) {
 
     // Main loop
     while (C_TRUE) {
-        // printf("Ghost boredom: %d\n", ghost->boredom);
 
         // Check if ghost is in room with hunter
         if (hunterInRoom(ghost) == C_TRUE) {
             // Resetting boredom counter
-            printf("Ghost and ");
-            for (int i = 0; i < ghost->room->hunterCount; i++) {
-                printf("hunter %s, ", ghost->room->hunters[i]->name);
-            }
-            printf("in %s!\n", ghost->room->name);
+    
 
             ghost->boredom = BOREDOM_MAX;
 
@@ -116,7 +118,7 @@ void* startGhost(void* g) {
             // Checking if ghost is bored
             if (ghost->boredom <= 0) {
                 // Ending this thread by breaking main loop
-                printf("Ghost got bored and left\n");
+                printf("| %20s | %30s | %20s |\n", "Ghost", "leaving building", "BORED");
                 break;
             }
 

@@ -240,6 +240,25 @@ void cleanupEvidenceListData(EvidenceListType* list) {
     }
 }
 
+char* getTypeString(EvidenceClassType type) {
+    switch (type) {
+        case EMF:
+            return "EMF";
+
+        case TEMPERATURE:
+            return "TEMPERATURE";
+
+        case FINGERPRINTS:
+            return "FINGERPRINTS";
+
+        case SOUND:
+            return "SOUND";
+
+        default:
+            return "UNKNOW";
+    }
+}
+
 void cleanupEvidenceListNodes(EvidenceListType* list) {
     // Temporary pointers
     EvidenceNodeType* currNode = list->head;

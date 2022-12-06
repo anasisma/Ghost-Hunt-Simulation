@@ -14,8 +14,8 @@
 #define C_ARR_ERR -3
 #define C_ARR_FULL -2
 #define C_MEM_ERR -1
-#define MAX_STR 64
-#define FEAR_RATE 5
+#define MAX_STR 20
+#define FEAR_RATE 1
 #define MAX_FEAR 100
 #define MAX_HUNTERS 4
 #define USLEEP_TIME 50000
@@ -138,6 +138,7 @@ void createStdEvidence(HunterType*, EvidenceType*);
 void placeGhostRandRoom(GhostType*, BuildingType*);
 void printHunterResult(HunterType*);
 void printSuspicions(HunterType*);
+char* getTypeString(EvidenceClassType);
 
 void cleanupBuilding(BuildingType*);
 void cleanupRoomList(RoomListType*);
