@@ -29,9 +29,10 @@ void initEvidenceList(EvidenceListType* list) {
 //        in:  Location of EvidenceType to append to list
 //   Purpose:  Adds EvidenceType to tail of the given EvidenceListType
 void appendEvidence(EvidenceListType* list, EvidenceType* evidence) {
+    EvidenceNodeType* newNode = (EvidenceNodeType*)calloc(1, sizeof(EvidenceNodeType));
 
-    EvidenceNodeType* newNode = (EvidenceNodeType*)malloc(sizeof(EvidenceNodeType));
-    if (newNode == NULL) {  // if memory failed to allocate, shut the program down
+    // if memory failed to allocate, shut the program down
+    if (newNode == NULL) {
         printf("Memory allocation error\n");
         exit(0);
     }
@@ -40,12 +41,14 @@ void appendEvidence(EvidenceListType* list, EvidenceType* evidence) {
 
     if (list->head == NULL) {  // if list is empty, both head and tail need to point to same node
         list->head = newNode;
+        list->tail = newNode;
     } else {
         EvidenceNodeType* iterator = list->head;
         while (iterator->next != NULL) {
             iterator = iterator->next;
         }
-        iterator->next = newNode;
+        list->tail->next = newNode;
+        list->tail = newNode;
     }
 }
 
@@ -54,77 +57,107 @@ void appendEvidence(EvidenceListType* list, EvidenceType* evidence) {
 //        in:  Location of EvidenceType to remove
 //   Purpose:  Remove evidence from given EvidenceListType
 void removeEvidence(EvidenceListType* list, EvidenceType* evidence) {
-    // Creating temporary node pointer
-    EvidenceNodeType* currNode;
-    currNode = list->head;
+    // // Creating temporary node pointer
+    // EvidenceNodeType* currNode;
+    // currNode = list->head;
 
-    // If list is empty, there's nothing to delete
-    if (currNode == NULL) {
-        printf("Removing evidence error: EvidenceType not in EvidenceListType!\n");
-        exit(C_ARR_ERR);
-    }
+    // while (currNode != NULL) {
+    //     printf("%p\n", currNode->evidence);
+    //     currNode = currNode->next;
+    // }
 
-    // Checking if head matches evidence to delete
-    if (currNode->evidence == evidence) {
-        // Changing head
-        list->head = currNode->next;
+    // currNode = list->head;
 
-        // Deleting head
-        free(currNode);
-        return;
-    }
-
-    // Looping through list
-    while (currNode->next != NULL) {
-        // Checking if currNode matches evidence to delete
-        if (currNode->next->evidence == evidence) {
-            // Deleting node
-            EvidenceNodeType* delNode = currNode->next;
-            currNode->next = delNode->next;
-
-            // Deleting head
-            free(currNode);
-            return;
-        }
-
-        currNode = currNode->next;
-    }
-
-    // If we reach this point it means the evidence was not in the list
-    printf("Removing evidence error: EvidenceType not in EvidenceListType!\n");
-    exit(C_ARR_ERR);
-
-    // EvidenceNodeType* iterator = list->head;
-    // if (iterator == NULL) { // If head is null then the list is empty
+    // // If list is empty, there's nothing to delete
+    // if (list->head == NULL) {
     //     printf("Removing evidence error: EvidenceListType is empty!\n");
     //     exit(C_ARR_ERR);
-    // } else if (iterator->next == NULL) { // If only the head/tail is non-null
-    //     if (!(iterator->evidence == evidence)) {
-    //         // If we reach this point it means the evidence was not in the list
-    //         printf("Removing evidence error: EvidenceType not in EvidenceListType!\n");
-    //         exit(C_ARR_ERR);
-    //     }
-    //     // If only the head/tail exist, free the node and make list's pointers point to null
-    //     free(iterator);
-    //     list->head = NULL;
-    //     list->tail = NULL;
-    // } else { // Loop until evidence is found in the list
-    //     while(iterator->next != NULL) {
-    //         if (iterator->next->evidence == evidence) {
-    //             // Make a temp node to free later
-    //             EvidenceNodeType* delNode = iterator->next;
-    //             // Change pointers to skip deleted node
-    //             iterator->next = iterator->next->next;
-    //             // Freeing deleted node
-    //             free(delNode);
-    //             break;
-    //         }
-    //         iterator = iterator->next;
-    //     }
-    //     // If we reach this point it means the evidence was not in the list
-    //     printf("Removing evidence error: EvidenceType not in EvidenceListType!\n");
-    //     exit(C_ARR_ERR);
     // }
+
+    // // Checking if head matches evidence to delete
+    // if (list->head->evidence == evidence) {
+
+    //     if (list->head->next != NULL) {
+    //          list->head = list->head->next;
+    //     } else {
+    //         list->head = NULL;
+    //     }
+    //     // Deleting head
+    //     free(currNode);
+    //     return;
+    // }
+
+    // // Looping through list
+    // while (currNode->next != NULL) {
+    //     // Checking if currNode matches evidence to delete
+    //     if (currNode->next->evidence == evidence) {
+
+    //         EvidenceNodeType* delNode = currNode->next;
+
+    //         //Checking if node to delete is tail
+    //         if (currNode->next == list->tail) {
+    //             list->tail = currNode;
+    //             currNode->next = NULL;
+    //         }
+            
+    //         // Deleting node
+    //         currNode->next = delNode->next;
+
+    //         // Deleting head
+    //         free(currNode);
+    //         return;
+    //     }
+
+    //     currNode = currNode->next;
+    // }
+
+    // // If we reach this point it means the evidence was not in the list
+    // printf("Removing evidence error: EvidenceType not in EvidenceListType!\n");
+    // exit(C_ARR_ERR);
+
+    EvidenceNodeType* iterator = list->head;
+    if (iterator == NULL) {  // If head is null then the list is empty
+        printf("Removing evidence error: EvidenceListType is empty!\n");
+        exit(C_ARR_ERR);
+    } else if (iterator->next == NULL) {  // If only the head/tail is non-null
+        if (!(iterator->evidence == evidence)) {
+            // If we reach this point it means the evidence was not in the list
+            printf("Removing evidence error: EvidenceType not in EvidenceListType! (only head was left)\n");
+            exit(C_ARR_ERR);
+        }
+        // If only the head/tail exist, free the node and make list's pointers point to null
+        free(iterator);
+        list->head = NULL;
+        list->tail = NULL;
+    } else {  
+        // If the list's head is the one we want to remove
+        if (iterator->evidence == evidence) {
+            // Changing head
+            list->head = iterator->next;
+
+            // Deleting head
+            free(iterator);
+            return;
+        } else {
+            // Loop until evidence is found in the list
+            while (iterator->next != NULL) {
+                if (iterator->next->evidence == evidence) {
+                    // Make a temp node to free later
+                    EvidenceNodeType* delNode = iterator->next;
+                    // Change pointers to skip deleted node
+                    iterator->next = iterator->next->next;
+                    // Freeing deleted node
+                    free(delNode);
+                    break;
+                }
+                iterator = iterator->next;
+            }
+        }
+        printf("value we wanted to delete is %p\n", evidence);
+        // If we reach this point it means the evidence was not in the list
+        printf("Removing evidence error: EvidenceType not in EvidenceListType! (at least 2 elements were in list)\n");
+        exit(C_ARR_ERR);
+    }
 }
 
 //   Function:  createEvidence

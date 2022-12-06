@@ -84,25 +84,25 @@ void getEvidence(HunterType* hunter) {
     if (sem_trywait(&(hunter->room->mutex)) == 0) {
 
         //Creating temporary node pointer
-        EvidenceListType* list = &(hunter->room->evidenceList);
         EvidenceNodeType* currNode;
-        currNode = list->head;
+        currNode = hunter->room->evidenceList.head;
 
         //Looping through list
         while (currNode != NULL) {
-            printf("%d type with value: %f\n", currNode->evidence->evidenceClass, currNode->evidence->value);
+            //printf("Hunter %s is in room %s and sees evidence %p\n", hunter->name, hunter->room->name, currNode->evidence);
+            //printf("Hunter %s is in room %s and sees evidence of type %d with value: %f\n", hunter->name, hunter->room->name, currNode->evidence->evidenceClass, currNode->evidence->value);
             //Checking if currNode has evidence hunter can pick up
             if (currNode->evidence->evidenceClass == hunter->evidenceClass) {
 
                 appendEvidence(hunter->evidenceList, currNode->evidence);
-                removeEvidence(list, currNode->evidence);
+                printf("Thing to remove: %p\n", currNode->evidence);
+                removeEvidence(&(hunter->room->evidenceList), currNode->evidence);
                 break;
             }
 
             currNode = currNode->next;
         }
         // Unlocking current room
-        
         sem_post(&(hunter->room->mutex));
     }
 }
