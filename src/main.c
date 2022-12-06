@@ -23,12 +23,14 @@ int main(int argc, char* argv[]) {
     // Placing hunters into the building's hunter array
     for (int i = 0; i < MAX_HUNTERS; i++) {
         building.hunters[i] = hunters[i];
+        hunters[i]->building = &building;
     }
 
     // Creating and initializing ghost
     GhostType* ghost;
     int ghostClass = randInt(0, 4);
     initGhost(BOREDOM_MAX, ghostClass, &ghost);
+    building.ghost = ghost;
 
     // Placing hunters into the van
     for (int i = 0; i < MAX_HUNTERS; i++) {
@@ -62,19 +64,20 @@ int main(int argc, char* argv[]) {
     // Printing results of simulation
     printResults(&building);
 
-    // // Freeing memory
-    // cleanupBuilding(&building);
+    // Freeing memory
+    cleanupBuilding(&building);
 
-    // //Freeing dynamically allocated hunter thread
-    // for (int i = 0; i < MAX_HUNTERS; i++) {
-    //     free(hunterThreads[i]);
-    // }
+    //Freeing dynamically allocated hunter threads
+    for (int i = 0; i < MAX_HUNTERS; i++) {
+        free(hunterThreads[i]);
+    }
 
-    // //Freeing dynamically allocated hunter names
-    // for (int i = 0; i < MAX_HUNTERS; i++) {
-    //     free(names[i]);
-    // }
+    //Freeing names
+    for (int i = 0; i < MAX_HUNTERS; i++) {
+        free(names[i]);
+    }
 
+    printf("NICE\n");
     return 0;
 }
 // Function: placeGhostRandRoom

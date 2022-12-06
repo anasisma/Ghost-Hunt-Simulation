@@ -82,6 +82,12 @@ void getEvidence(HunterType* hunter) {
 
     // Check if current room is available for modification
     if (sem_trywait(&(hunter->room->mutex)) == 0) {
+
+        //Wait for hunters list to be available
+        sem_wait(&(hunter->mutex));
+
+        //Wait for buildings list to be avaible
+        sem_wait(&(hunter->building->mutex));
         // Creating temporary node pointer
         EvidenceNodeType* currNode;
         currNode = hunter->room->evidenceList.head;
@@ -93,7 +99,10 @@ void getEvidence(HunterType* hunter) {
                 evidFound = C_TRUE;
                 // append evidence to hunter's list and remove it from room's list
                 appendEvidence(hunter->evidenceList, currNode->evidence);
+                //Append evidence to buildings list
+                appendEvidence(&hunter->building->evidenceList, currNode->evidence);
                 removeEvidence(&(hunter->room->evidenceList), currNode->evidence);
+
                 hunter->boredom = BOREDOM_MAX;  // reset hunter's boredom since they found ghostly evidence
                 break;                          // break to immediately exit the loop, to not add more evidence
             }
@@ -111,8 +120,14 @@ void getEvidence(HunterType* hunter) {
 
             // Adding evidence to hunter's list
             appendEvidence(hunter->evidenceList, evidence);
+            //Append evidence to buildings list
+            appendEvidence(&hunter->building->evidenceList, evidence);
         }
 
+        //Unlocking buildings list
+        sem_post(&(hunter->building->mutex));
+        //Unlocking hunters list
+        sem_post(&(hunter->mutex));
         // Unlocking current room
         sem_post(&(hunter->room->mutex));
     }
@@ -333,4 +348,13 @@ void* startHunter(void* h) {
         // Sleep
         usleep(USLEEP_TIME);
     }
+}
+
+void cleanupHunter(HunterType* hunter) {
+
+    cleanupEvidenceListNodes(hunter->evidenceList);
+    //Freeing evidenceList pointer
+    free(hunter->evidenceList);
+
+    free(hunter);
 }

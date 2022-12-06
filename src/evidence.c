@@ -29,7 +29,7 @@ void initEvidenceList(EvidenceListType* list) {
 //        in:  Location of EvidenceType to append to list
 //   Purpose:  Adds EvidenceType to tail of the given EvidenceListType
 void appendEvidence(EvidenceListType* list, EvidenceType* evidence) {
-    EvidenceNodeType* newNode = (EvidenceNodeType*)calloc(1, sizeof(EvidenceNodeType));
+    EvidenceNodeType* newNode = (EvidenceNodeType*)malloc(sizeof(EvidenceNodeType));
 
     // if memory failed to allocate, shut the program down
     if (newNode == NULL) {
@@ -64,10 +64,25 @@ void removeEvidence(EvidenceListType* list, EvidenceType* evidence) {
         printf("Removing evidence error: EvidenceListType is empty!\n");
         exit(C_ARR_ERR);
     }
+
+    if (list->head->evidence == evidence) {
+        list->head = list->head->next;
+        free(i);
+        return;
+    }
+
     while (i != NULL) {
         if (i->evidence == evidence) {
-            iPrev->next = i->next;
-            return;
+            if (i == list->tail) {
+                list->tail = iPrev;
+                iPrev->next = NULL;
+                free(i);
+                return;
+            } else {
+                iPrev->next = i->next;
+                free(i);
+                return;
+            }
         }
         iPrev = i;
         i = i->next;
@@ -207,4 +222,36 @@ void getFingerprints(float* value) {
 void getSound(float* value) {
     float val = randFloat(65, 75);
     *value = val;
+}
+
+void cleanupEvidenceListData(EvidenceListType* list) {
+    // Temporary pointers
+    EvidenceNodeType* currNode = list->head;
+    EvidenceNodeType* nextNode;
+
+    // Looping through all nodes in list
+    while (currNode != NULL) {
+        nextNode = currNode->next;
+
+        // Freeing evidence
+        free(currNode->evidence);
+
+        currNode = nextNode;
+    }
+}
+
+void cleanupEvidenceListNodes(EvidenceListType* list) {
+    // Temporary pointers
+    EvidenceNodeType* currNode = list->head;
+    EvidenceNodeType* nextNode;
+
+    // Looping through all nodes in list
+    while (currNode != NULL) {
+        nextNode = currNode->next;
+
+        // Freeing node
+        free(currNode);
+
+        currNode = nextNode;
+    }
 }

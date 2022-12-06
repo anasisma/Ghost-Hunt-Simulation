@@ -117,9 +117,48 @@ void removeHunter(RoomType *room, HunterType *hunter) {
     exit(C_ARR_ERR);
 }
 
+void cleanupRoom(RoomType* room) {
+    cleanupEvidenceListData(&room->evidenceList);
+    cleanupEvidenceListNodes(&room->evidenceList);
+    cleanupRoomList(&room->connectedRooms);
+    free(room);
+}
+
 //  Function:  cleanupRoom
 //     in/ou:  Location of RoomType to cleanup
 //   Purpose:  Free memory allocated for a particular room (doesn't free it's data)
-void cleanupRoom(RoomType *room) {
-    free(room);
+void cleanupRoomList(RoomListType* list) {
+    
+    //Temporary pointers
+    RoomNodeType* currNode = list->head;
+    RoomNodeType* nextNode;
+
+    //Looping through all nodes in list
+    while (currNode != NULL) {
+        
+        nextNode = currNode->next;
+
+        //Freeing node and room
+        free(currNode);
+
+        currNode = nextNode;
+    }
+}
+
+void cleanupRoomListData(RoomListType* list) {
+
+    //Temporary pointers
+    RoomNodeType* currNode = list->head;
+    RoomNodeType* nextNode;
+
+    //Looping through all nodes in list
+    while (currNode != NULL) {
+        
+        nextNode = currNode->next;
+
+        //Freeing node and room
+        cleanupRoom(currNode->room);
+
+        currNode = nextNode;
+    }
 }

@@ -73,6 +73,7 @@ typedef struct GhostType {
 } GhostType;
 
 typedef struct HunterType {
+    struct BuildingType* building;
     RoomType* room;
     EvidenceClassType evidenceClass;
     EvidenceListType* evidenceList;
@@ -86,7 +87,9 @@ typedef struct HunterType {
 typedef struct BuildingType {
     GhostType* ghost;
     RoomListType rooms;
+    EvidenceListType evidenceList;
     HunterType* hunters[MAX_HUNTERS];
+    sem_t mutex;
 } BuildingType;
 
 int randInt(int, int);          // Generates a pseudorandom integer between the parameters
@@ -137,3 +140,8 @@ void printHunterResult(HunterType*);
 void printSuspicions(HunterType*);
 
 void cleanupBuilding(BuildingType*);
+void cleanupRoomList(RoomListType*);
+void cleanupEvidenceListNodes(EvidenceListType*);
+void cleanupEvidenceListData(EvidenceListType*);
+void cleanupHunter(HunterType*);
+void cleanupRoomListData(RoomListType*);

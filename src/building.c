@@ -7,6 +7,13 @@
 void initBuilding(BuildingType* building) {
     building->ghost = NULL;
     initRoomList(&(building->rooms));
+    initEvidenceList(&building->evidenceList);
+
+    // Initlizing mutex
+    if (sem_init(&(building->mutex), 0, 1) < 0) {
+        printf("Semaphore error: couldn't initlize building mutex!\n");
+        exit(C_SEM_ERR);
+    }
 }
 
 /*
@@ -117,4 +124,20 @@ void populateRooms(BuildingType* building) {
 }
 
 void cleanupBuilding(BuildingType* building) {
+
+    //Freeing rooms
+    cleanupRoomListData(&building->rooms);
+    cleanupRoomList(&building->rooms);
+
+    //Freeing ghost
+    free(building->ghost);
+
+    //Freeing evidence
+    cleanupEvidenceListData(&building->evidenceList);
+    cleanupEvidenceListNodes(&building->evidenceList);
+
+    //Freeing hunters
+    for (int i = 0; i < MAX_HUNTERS; i++) {
+        cleanupHunter(building->hunters[i]);
+    }
 }
