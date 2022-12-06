@@ -8,7 +8,7 @@ int main(int argc, char* argv[]) {
     char* names[MAX_HUNTERS];
 
     // Getting names from user
-    printf("Ghost and hunters simulation!");
+    printf("Ghost and hunters simulation!\n");
     getHunterNames(names);
 
     // Creating building, initilizing it, and populating it with rooms
@@ -119,7 +119,7 @@ void getHunterNames(char** names) {
         }
 
         // Getting name from standard input
-        printf("\nEnter the name of hunter %d: ", i + 1);
+        printf("Enter the name of hunter %d: ", i + 1);
         scanf("%s", name);
         names[i] = name;
     }

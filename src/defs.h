@@ -15,7 +15,7 @@
 #define C_ARR_FULL -2
 #define C_MEM_ERR -1
 #define MAX_STR 64
-#define FEAR_RATE 1
+#define FEAR_RATE 10
 #define MAX_FEAR 100
 #define MAX_HUNTERS 4
 #define USLEEP_TIME 50000
@@ -130,6 +130,7 @@ void getHunterNames(char**);
 void initHunters(pthread_t*);
 void createInitHunters(HunterType**, char**);
 void createHunterThreads(pthread_t**);
+void createStdEvidence(HunterType*, EvidenceType*);
 void placeGhostRandRoom(GhostType*, BuildingType*);
 
 void cleanupBuilding(BuildingType*);

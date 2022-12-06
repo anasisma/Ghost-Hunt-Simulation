@@ -8,3 +8,5 @@ COMP2401B Final Project: Threads and Simulations
 November 28: First Check-Up  
 December 5: Second Check-Up  
 December 7: Project Deadline
+
+hunters leave van before doing anything else, but can come back later
