@@ -1,13 +1,14 @@
 #include "defs.h"
 
 // Function:  initBuilding
-//       in:  Location of BuildingType to be modified
-//      out:  Modified BuildingType
-//  Purpose:  initializes fields of the given building parameter
+//    in/ou:  Location of BuildingType to initlize
+//  Purpose:  Initializes fields of the given building
 void initBuilding(BuildingType* building) {
+    //Initlizing parameters
     building->ghost = NULL;
     initRoomList(&(building->rooms));
-    initEvidenceList(&building->evidenceList);
+    EvidenceListType* list = &building->evidenceList;
+    initEvidenceList(&list);
 
     // Initlizing mutex
     if (sem_init(&(building->mutex), 0, 1) < 0) {
@@ -32,9 +33,12 @@ void initBuilding(BuildingType* building) {
     https://steamcommunity.com/sharedfiles/filedetails/?id=2251267947
 
 */
+
+// Function:  populateRooms
+//    in/ou:  Location of BuildingType to populate with rooms from phasmaphobia map
+//  Purpose:  Creates and connects rooms to replicate phasmaphobia
 void populateRooms(BuildingType* building) {
-    // First, create each room. Perhaps you want to include more data
-    // in the init parameters?
+    //Allocating and rooms and initlizing them
     RoomType* van = (RoomType*)calloc(1, sizeof(RoomType));
     initRoom(van, "Van");
     RoomType* hallway = (RoomType*)calloc(1, sizeof(RoomType));
@@ -62,7 +66,7 @@ void populateRooms(BuildingType* building) {
     RoomType* utility_room = (RoomType*)calloc(1, sizeof(RoomType));
     initRoom(utility_room, "Utility Room");
 
-    // Now create a linked list of rooms using RoomNodeType in the Building
+    //Allocating roomNodes and to hold rooms
     RoomNodeType* van_node = (RoomNodeType*)calloc(1, sizeof(RoomNodeType));
     van_node->room = van;
     RoomNodeType* hallway_node = (RoomNodeType*)calloc(1, sizeof(RoomNodeType));
@@ -90,9 +94,10 @@ void populateRooms(BuildingType* building) {
     RoomNodeType* utility_room_node = (RoomNodeType*)calloc(1, sizeof(RoomNodeType));
     utility_room_node->room = utility_room;
 
-    // Building->rooms might be a linked list structre, or maybe just a node.
+    //Initlizing building's rooms' linkedList
     initRoomList(&building->rooms);
 
+    //Appending all roomNodes to building's rooms' linkedList
     appendRoom(&(building->rooms), van_node);
     appendRoom(&(building->rooms), hallway_node);
     appendRoom(&(building->rooms), master_bedroom_node);
@@ -107,8 +112,7 @@ void populateRooms(BuildingType* building) {
     appendRoom(&(building->rooms), garage_node);
     appendRoom(&(building->rooms), utility_room_node);
 
-    // Now connect the rooms. It is possible you do not need a separate
-    // function for this, but it is provided to give you a starting point.
+    //Connecting rooms together according to phasmaphobia map
     connectRooms(van, hallway);
     connectRooms(hallway, master_bedroom);
     connectRooms(hallway, boys_bedroom);
@@ -123,20 +127,27 @@ void populateRooms(BuildingType* building) {
     connectRooms(garage, utility_room);
 }
 
+// Function:  cleanupBuilding
+//    in/ou:  Location of BuildingType to cleanup
+//  Purpose:  Frees all memory associated with a building
 void cleanupBuilding(BuildingType* building) {
 
-    //Freeing rooms
+    //Freeing RoomTypes
     cleanupRoomListData(&building->rooms);
-    cleanupRoomList(&building->rooms);
+
+    //Freeing RoomNodeTypes
+    cleanupRoomListNodes(&building->rooms);
 
     //Freeing ghost
     free(building->ghost);
 
-    //Freeing evidence
+    //Freeing EvidenceTypes
     cleanupEvidenceListData(&building->evidenceList);
+
+    //Freeing EvidenceNodeTypes
     cleanupEvidenceListNodes(&building->evidenceList);
 
-    //Freeing hunters
+    //Freeing HunterTypes
     for (int i = 0; i < MAX_HUNTERS; i++) {
         cleanupHunter(building->hunters[i]);
     }

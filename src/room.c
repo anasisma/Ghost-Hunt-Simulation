@@ -38,7 +38,6 @@ void initRoomList(RoomListType *list) {
 //        in:  Location of RoomNodeType to append to list
 //   Purpose:  Adds RoomNodeType to tail of the given RoomListType
 void appendRoom(RoomListType *list, RoomNodeType *roomNode) {
-    
     roomNode->next = NULL;
 
     // If list is empty, both head and tail need to point to new node
@@ -59,9 +58,8 @@ void appendRoom(RoomListType *list, RoomNodeType *roomNode) {
 //     in/ou:  Location of second RoomType
 //   Purpose:  Add each room to each other's RoomListType
 void connectRooms(RoomType *r1, RoomType *r2) {
-
-    RoomNodeType* n1 = (RoomNodeType*)malloc(sizeof(RoomNodeType));
-    RoomNodeType* n2 = (RoomNodeType*)malloc(sizeof(RoomNodeType));
+    RoomNodeType *n1 = (RoomNodeType *)malloc(sizeof(RoomNodeType));
+    RoomNodeType *n2 = (RoomNodeType *)malloc(sizeof(RoomNodeType));
     n1->room = r1;
     n2->room = r2;
 
@@ -97,66 +95,72 @@ void addHunter(RoomType *room, HunterType *hunter) {
 void removeHunter(RoomType *room, HunterType *hunter) {
     int size = room->hunterCount;
 
+    // check if the room's hunter array is empty
     if (size <= 0) {
         printf("Error remove hunter from room: room's hunters array is empty!\n");
         exit(C_ARR_ERR);
     }
+    // loop through hunter array to find hunter we want to remove
     for (int i = 0; i < size; i++) {
         if (room->hunters[i] == hunter) {
+            // loop to iterate from the hunter's index onwards, to shift the others back
             for (int j = i; j < size - 1; j++) {
                 room->hunters[j] = room->hunters[j + 1];
             }
-            
+            // set whatever was at the end of the array to null and decrement hunterCount
             room->hunters[size] = NULL;
             room->hunterCount--;
+
+            // make hunter we removed's room parameter point to null
             hunter->room = NULL;
             return;
         }
     }
+    // if this point is reached, the hunter wasn't found in the array
     printf("Error removing hunter from room: hunter not in room's hunters array!\n");
     exit(C_ARR_ERR);
 }
 
-void cleanupRoom(RoomType* room) {
+//  Function:  cleanupRoom
+//     in/ou:  Location of RoomType to cleanup
+//   Purpose:  Free memory allocated for a particular room
+void cleanupRoom(RoomType *room) {
+    // call the functions to clean each field of a room, then free the room itself
     cleanupEvidenceListData(&room->evidenceList);
     cleanupEvidenceListNodes(&room->evidenceList);
-    cleanupRoomList(&room->connectedRooms);
+    cleanupRoomListNodes(&room->connectedRooms);
     free(room);
 }
 
-//  Function:  cleanupRoom
-//     in/ou:  Location of RoomType to cleanup
-//   Purpose:  Free memory allocated for a particular room (doesn't free it's data)
-void cleanupRoomList(RoomListType* list) {
-    
-    //Temporary pointers
-    RoomNodeType* currNode = list->head;
-    RoomNodeType* nextNode;
+//  Function:  cleanupRoomListNodes
+//     in/ou:  Location of RoomListType to cleanup
+//   Purpose:  Free memory allocated for the nodes of a particular roomlist (doesn't free it's data)
+void cleanupRoomListNodes(RoomListType *list) {
+    // Temporary pointers
+    RoomNodeType *currNode = list->head;
+    RoomNodeType *nextNode;
 
-    //Looping through all nodes in list
+    // Looping through all nodes in list
     while (currNode != NULL) {
-        
         nextNode = currNode->next;
 
-        //Freeing node and room
+        // Freeing node and room
         free(currNode);
 
         currNode = nextNode;
     }
 }
 
-void cleanupRoomListData(RoomListType* list) {
+void cleanupRoomListData(RoomListType *list) {
+    // Temporary pointers
+    RoomNodeType *currNode = list->head;
+    RoomNodeType *nextNode;
 
-    //Temporary pointers
-    RoomNodeType* currNode = list->head;
-    RoomNodeType* nextNode;
-
-    //Looping through all nodes in list
+    // Looping through all nodes in list
     while (currNode != NULL) {
-        
         nextNode = currNode->next;
 
-        //Freeing node and room
+        // Freeing node and room
         cleanupRoom(currNode->room);
 
         currNode = nextNode;

@@ -1,3 +1,4 @@
+//Libraries to include
 #include <math.h>
 #include <pthread.h>
 #include <semaphore.h>
@@ -7,6 +8,7 @@
 #include <time.h>
 #include <unistd.h>
 
+//Constants and definitions
 #define C_TRUE 1
 #define C_FALSE 0
 #define C_NO_ROOMS -5
@@ -14,13 +16,15 @@
 #define C_ARR_ERR -3
 #define C_ARR_FULL -2
 #define C_MEM_ERR -1
-#define MAX_STR 20
-#define FEAR_RATE 1
+#define MAX_STR 21
+#define BOREDOM_RATE 1
+#define FEAR_RATE 5
 #define MAX_FEAR 100
 #define MAX_HUNTERS 4
 #define USLEEP_TIME 50000
-#define BOREDOM_MAX 99
+#define BOREDOM_MAX 100
 
+//Enum definitions
 typedef enum { EMF,
                TEMPERATURE,
                FINGERPRINTS,
@@ -30,6 +34,7 @@ typedef enum { POLTERGEIST,
                BULLIES,
                PHANTOM } GhostClassType;
 
+//Struct definitions
 typedef struct EvidenceType {
     float value;
     EvidenceClassType evidenceClass;
@@ -92,57 +97,58 @@ typedef struct BuildingType {
     sem_t mutex;
 } BuildingType;
 
-int randInt(int, int);          // Generates a pseudorandom integer between the parameters
-float randFloat(float, float);  // Generates a pseudorandom float between the parameters
-
-void populateRooms(BuildingType*);  // Populates the building with sample data for rooms
-
 // all the forward definitions for functions
-void initRoom();
-void initRoomList(RoomListType*);
 void appendRoom(RoomListType*, RoomNodeType*);
 void connectRooms(RoomType*, RoomType*);
 void addHunter(RoomType*, HunterType*);
 void removeHunter(RoomType*, HunterType*);
-int checkIfFoundGhost(HunterType*);
-void cleanupRoom(RoomType*);
-void getEvidence(HunterType*);
 void communicateEvidence(HunterType*);
-void initEvidenceList(EvidenceListType*);
-
-void initGhost(int, GhostClassType, GhostType**);
 void *startGhost(void*);
 void *startHunter(void*);
 void leaveEvidence(GhostType*);
-void cleanupGhost(GhostType*);
-int ghostInRoom(HunterType*);
-
-void initBuilding(BuildingType*);
-void printResults(BuildingType*);
-
-void initEvidence(EvidenceType**);
-void createEvidence(GhostType*, EvidenceType*);
 void appendEvidence(EvidenceListType*, EvidenceType*);
 void removeEvidence(EvidenceListType*, EvidenceType*);
+
+void populateRooms(BuildingType*); 
+void placeGhostRandRoom(GhostType*, BuildingType*);
+char* getTypeString(EvidenceClassType);
+int randInt(int, int);
+int checkIfFoundGhost(HunterType*);
+int isGhostlyVal(EvidenceType*);
+int ghostInRoom(HunterType*);
+float randFloat(float, float);
+
+void initRoom();
+void initRoomList(RoomListType*);
+void initGhost(GhostType**, GhostClassType);
+void initHunters(pthread_t*);
+void initEvidence(EvidenceType**);
+void initEvidenceList(EvidenceListType**);
+void initBuilding(BuildingType*);
+
 void getEMF(float*);
 void getTemperature(float*);
 void getSound(float*);
 void getFingerprints(float*);
-int isGhostlyVal(EvidenceType*);
-
 void getHunterNames(char**);
-void initHunters(pthread_t*);
+void getEvidence(HunterType*);
+
+void createEvidence(GhostClassType, EvidenceType*);
 void createInitHunters(HunterType**, char**);
 void createHunterThreads(pthread_t**);
-void createStdEvidence(HunterType*, EvidenceType*);
-void placeGhostRandRoom(GhostType*, BuildingType*);
+void createStdEvidence(EvidenceClassType, EvidenceType*);
+
 void printHunterResult(HunterType*);
 void printSuspicions(HunterType*);
-char* getTypeString(EvidenceClassType);
+void printResults(BuildingType*);
+void printWinner(BuildingType*);
+void determineGhostType(BuildingType*, int, int, int, int);
 
 void cleanupBuilding(BuildingType*);
-void cleanupRoomList(RoomListType*);
+void cleanupRoomListNodes(RoomListType*);
 void cleanupEvidenceListNodes(EvidenceListType*);
 void cleanupEvidenceListData(EvidenceListType*);
 void cleanupHunter(HunterType*);
 void cleanupRoomListData(RoomListType*);
+void cleanupGhost(GhostType*);
+void cleanupRoom(RoomType*);

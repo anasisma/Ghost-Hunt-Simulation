@@ -1,27 +1,41 @@
 #include "defs.h"
 
 //   Function:  initEvidence
-//         in:  Location of EvidenceType to be modified
-//         in:  Attributes of EvidenceType to be added
-//        out:  Modified EvidenceType
-//    Purpose:  Initializes all fields of the given EvidenceType parameter
+//      in/ou:  Pointer to location of EvidenceType to initialize
+//    Purpose:  Allocates and initialize the given EvidenceType
 void initEvidence(EvidenceType** evidence) {
-    EvidenceType* newEvid = (EvidenceType*)malloc(sizeof(EvidenceType));  // allocate mem for new ghost
-    if (newEvid == NULL) {                                                // if memory failed to allocate, shut the program down
-        printf("Memory allocation error\n");
+    // Allocating memory for evidence
+    EvidenceType* newEvid = (EvidenceType*)malloc(sizeof(EvidenceType));
+
+    // Checking if memory was allocated correctly
+    if (newEvid == NULL) {
+        printf("Memory allocation error: couldn't malloc new EvidenceType!\n");
         exit(C_MEM_ERR);
     }
 
-    *evidence = newEvid;  // return this new structure using the evidence parameter
+    // return newEvid structure using the pointer parameter
+    *evidence = newEvid;
 }
 
-/*   Function:  initEvidenceList                                        */
-/*         in:  Location of EvidenceListType to be modified            */
-/*        out:  Modified EvidenceListType                               */
-/*    Purpose:  initializes both fields of the given list parameter to default values      */
-void initEvidenceList(EvidenceListType* list) {
-    list->head = NULL;
-    list->tail = NULL;  // set both head and tail (list starts as empty)
+//   Function:  initEvidenceList
+//      in/ou:  Pointer to location of EvidenceListType to initialize
+//    Purpose:  Allocates and initializes parameters of given EvidenceListType
+void initEvidenceList(EvidenceListType** list) {
+    //Allocating memory for list
+    EvidenceListType* newList = (EvidenceListType*)malloc(sizeof(EvidenceListType));
+
+    // Checking if list was allocated correctly
+    if (newList == NULL) {
+        printf("Memory allocation error: couldn't malloc new EvidenceListType!\n");
+        exit(C_MEM_ERR);
+    }
+
+    //Setting attributes of new EvidenceListType
+    newList->head = NULL;
+    newList->tail = NULL;
+
+    //return newList structure using the pointer parameter
+    *list = newList;
 }
 
 //  Function:  appendEvidence
@@ -29,24 +43,26 @@ void initEvidenceList(EvidenceListType* list) {
 //        in:  Location of EvidenceType to append to list
 //   Purpose:  Adds EvidenceType to tail of the given EvidenceListType
 void appendEvidence(EvidenceListType* list, EvidenceType* evidence) {
+    // Allocating memory for new EvidenceNodeType
     EvidenceNodeType* newNode = (EvidenceNodeType*)malloc(sizeof(EvidenceNodeType));
 
-    // if memory failed to allocate, shut the program down
+    // Checking if memory was allocated correctly
     if (newNode == NULL) {
-        printf("Memory allocation error\n");
-        exit(0);
+        printf("Memory allocation error: couldn't malloc new EvidenceNodeType!\n");
+        exit(C_MEM_ERR);
     }
+
+    // Setting attributes of new EvidenceNodeType
     newNode->evidence = evidence;
     newNode->next = NULL;
 
-    if (list->head == NULL) {  // if list is empty, both head and tail need to point to same node
+    // If list is empty, set new node as head and tail
+    if (list->head == NULL) {
         list->head = newNode;
         list->tail = newNode;
+
+        // If list is not empty, set new node as tail
     } else {
-        EvidenceNodeType* iterator = list->head;
-        while (iterator->next != NULL) {
-            iterator = iterator->next;
-        }
         list->tail->next = newNode;
         list->tail = newNode;
     }
@@ -55,54 +71,68 @@ void appendEvidence(EvidenceListType* list, EvidenceType* evidence) {
 //  Function:  removeEvidence
 //     in/ou:  Location of EvidenceListType to remove evidence from
 //        in:  Location of EvidenceType to remove
-//   Purpose:  Remove evidence from given EvidenceListType
+//   Purpose:  Remove evidence from given EvidenceListType and frees memory associated with removed node
 void removeEvidence(EvidenceListType* list, EvidenceType* evidence) {
+    // Making temporary pointers
     EvidenceNodeType* i = list->head;
     EvidenceNodeType* iPrev = list->head;
 
-    if (i == NULL) {  // If head is null then the list is empty
+    // Checking if list is empty
+    if (i == NULL) {
         printf("Removing evidence error: EvidenceListType is empty!\n");
         exit(C_ARR_ERR);
     }
 
+    // Checking if evidence to remove is head of list
     if (list->head->evidence == evidence) {
         list->head = list->head->next;
         free(i);
         return;
     }
 
+    // Looping through list to find matching evidence
     while (i != NULL) {
+        // Remove evidenceType that matches
         if (i->evidence == evidence) {
+            // Checking if evidenceType to remove is tail
             if (i == list->tail) {
+                // if we need to remove the tail, make the tail point to the prev node
                 list->tail = iPrev;
+                // make the next of the new tail point to null
                 iPrev->next = NULL;
+                // free the old tail node
                 free(i);
+                // exit the function
                 return;
-            } else {
+            } else {  // node to delete is not the tail
+                // we just need to make the prev node point to whatever is after it
                 iPrev->next = i->next;
+                // free the node
                 free(i);
                 return;
             }
         }
+        // iterator forward, while having iPrev be 1 step behind
         iPrev = i;
         i = i->next;
     }
-    // If we reach this point it means the evidence was not in the list
+
+    // List did not contain evidenceType to delete, this is undefined behaviour therefor exiting process
     printf("Removing evidence error: EvidenceType not in EvidenceListType! (at least 2 elements were in list)\n");
     exit(C_ARR_ERR);
 }
 
 //   Function:  createEvidence
-//         in:  Pointer to GhostType to determine ghost class
+//         in:  GhostClassType to create evidence from
 //      in/ou:  Pointer to EvidenceType to be created
-//    Purpose:  Determines the class of the evidence as well as its value
-void createEvidence(GhostType* ghost, EvidenceType* evidence) {
+//    Purpose:  Gives given EvidenceType a class and value based on the given GhostClassType
+void createEvidence(GhostClassType ghostClass, EvidenceType* evidence) {
     float value;
     int evidenceType = randInt(0, 3);
     EvidenceClassType evidenceClass;
 
-    // Generating evidence value based on ghost type
-    switch (ghost->ghostClass) {
+    // Generating evidence value and class based on GhostClassType
+    switch (ghostClass) {
         case POLTERGEIST:
             if (evidenceType == 0) {
                 getEMF(&value);
@@ -162,10 +192,12 @@ void createEvidence(GhostType* ghost, EvidenceType* evidence) {
 }
 
 //  Function: isGhostlyVal
-//        in: Pointer to evidence to evalute
-//   Purpose: Determine if the evidence's value is within the "ghostly" range
+//        in: Pointer to EvidenceType to evaluate
+//   Purpose: Determine if the given EvidenceType's value is within the ghostly range
+//    Return: Returns C_TRUE if the given evidence is ghostly, C_FALSE otherwise
 int isGhostlyVal(EvidenceType* evidence) {
-    // Determining validity of evidence value based on evidence type
+    // Determining validity of evidence value based on evidence's EvidenceClassType
+    // return C_TRUE if value is ghostly
     switch (evidence->evidenceClass) {
         case EMF:
             if (evidence->value > 4.9) {
@@ -195,35 +227,57 @@ int isGhostlyVal(EvidenceType* evidence) {
 
 //  Function: getEMF
 //     in/ou: Pointer to float used to return the value
-//   Purpose: Return a randomly generated EMF value
+//   Purpose: Returns a randomly generated EMF value in the ghost range (NOT ALWAYS GHOSTLY)
 void getEMF(float* value) {
-    float val = randFloat(4.7, 5.0);
-    *value = val;
+    *value = randFloat(4.7, 5.0);
 }
 
 //  Function: getTemperature
 //     in/ou: Pointer to float used to return the value
-//   Purpose: Return a randomly generated temperature value
+//   Purpose: Returns a randomly generated temperature value in the ghost range (NOT ALWAYS GHOSTLY)
 void getTemperature(float* value) {
-    float val = randFloat(-10, 1);
-    *value = val;
+    *value = randFloat(-10, 1);
 }
 
 //  Function: getFingerprints
 //     in/ou: Pointer to float used to return the value
-//   Purpose: Return a randomly generated fingerprint value
+//   Purpose: Returns a fingerprint value in the ghost range (ALWAYS GHOSTLY)
 void getFingerprints(float* value) {
     *value = 1.0;
 }
 
 //  Function: getSound
 //     in/ou: Pointer to float used to return the value
-//   Purpose: Return a randomly generated decibel value
+//   Purpose: Returns a randomly generated sound value in the ghost range (NOT ALWAYS GHOSTLY)
 void getSound(float* value) {
-    float val = randFloat(65, 75);
-    *value = val;
+    *value = randFloat(65, 75);
 }
 
+// Function:  getTypeString
+//       in:  EvidenceClassType to get string from
+//   Return:  Returns the string representation of the given EvidenceClassType
+char* getTypeString(EvidenceClassType type) {
+    switch (type) {
+        case EMF:
+            return "EMF";
+
+        case TEMPERATURE:
+            return "TEMPERATURE";
+
+        case FINGERPRINTS:
+            return "FINGERPRINTS";
+
+        case SOUND:
+            return "SOUND";
+
+        default:
+            return "UNKNOWN";
+    }
+}
+
+// Function:  cleanupEvidenceListData
+//    in/ou:  Location of EvidenceListType to cleanup data
+//  Purpose:  Frees all the EvidenceTypes contained in given linkedList
 void cleanupEvidenceListData(EvidenceListType* list) {
     // Temporary pointers
     EvidenceNodeType* currNode = list->head;
@@ -240,25 +294,9 @@ void cleanupEvidenceListData(EvidenceListType* list) {
     }
 }
 
-char* getTypeString(EvidenceClassType type) {
-    switch (type) {
-        case EMF:
-            return "EMF";
-
-        case TEMPERATURE:
-            return "TEMPERATURE";
-
-        case FINGERPRINTS:
-            return "FINGERPRINTS";
-
-        case SOUND:
-            return "SOUND";
-
-        default:
-            return "UNKNOW";
-    }
-}
-
+// Function:  cleanupEvidenceListNodes
+//    in/ou:  Location of EvidenceListType to cleanup nodes
+//  Purpose:  Frees all the EvidenceNodeTypes contained in given linkedList
 void cleanupEvidenceListNodes(EvidenceListType* list) {
     // Temporary pointers
     EvidenceNodeType* currNode = list->head;

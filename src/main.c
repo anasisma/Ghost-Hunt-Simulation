@@ -28,8 +28,8 @@ int main(int argc, char* argv[]) {
 
     // Creating and initializing ghost
     GhostType* ghost;
-    int ghostClass = randInt(0, 4);
-    initGhost(BOREDOM_MAX, ghostClass, &ghost);
+    GhostClassType ghostClass = randInt(0, 4);
+    initGhost(&ghost, ghostClass);
     building.ghost = ghost;
 
     // Placing hunters into the van
@@ -67,17 +67,17 @@ int main(int argc, char* argv[]) {
     // Freeing memory
     cleanupBuilding(&building);
 
-    //Freeing dynamically allocated hunter threads
+    // Freeing dynamically allocated hunter threads
     for (int i = 0; i < MAX_HUNTERS; i++) {
         free(hunterThreads[i]);
     }
 
-    //Freeing names
+    // Freeing names
     for (int i = 0; i < MAX_HUNTERS; i++) {
         free(names[i]);
     }
 
-    printf("NICE\n");
+    printf("\n");
     return 0;
 }
 // Function: placeGhostRandRoom
@@ -139,14 +139,36 @@ void getHunterNames(char** names) {
 //  Comments: Assumes function is only called on a building whose simulation has ended
 void printResults(BuildingType* building) {
     printf("All done! Let's tally the results:\n");
+    // call function to print the result of each hunter in the building's hunter array
     for (int i = 0; i < MAX_HUNTERS; i++) {
         printHunterResult(building->hunters[i]);
     }
+    printWinner(building);
     for (int i = 0; i < MAX_HUNTERS; i++) {
+        // if the hunter array has a hunter that suspects a ghost, print their suspicions
         if (building->hunters[i]->suspicious) {
             printSuspicions(building->hunters[i]);
+            // break, since in a large majority of cases, the hunters that win will have the same evidence
             break;
         }
+    }
+}
+
+void printWinner(BuildingType* building) {
+    int winners = C_FALSE;
+    for (int i = 0; i < MAX_HUNTERS; i++) {
+        if (building->hunters[i]->suspicious) {
+            winners = C_TRUE;
+        }
+    }
+    switch (winners) {
+        case C_TRUE:
+            printf("Hunters win! ");
+            break;
+
+        default:
+            printf("Ghost wins! ");
+            break;
     }
 }
 
@@ -154,6 +176,7 @@ void printResults(BuildingType* building) {
 //        in: Pointer to hunter to print
 //   Purpose: Prints the hunt results of a singular hunter
 void printHunterResult(HunterType* hunter) {
+    // print hunter's name, then the reason they left the building
     printf("    * %s ", hunter->name);
     if (hunter->fear >= 100) {
         printf("has run away in fear!\n");
@@ -164,20 +187,28 @@ void printHunterResult(HunterType* hunter) {
     }
 }
 
+// Function: printSuspicions
+//       in: Pointer to hunter, to get the evidence list
+//  Purpose: Find and print all the ghostly evidence values the hunter has
 void printSuspicions(HunterType* hunter) {
     printf("Here is the evidence that was used to uncover the ghost: \n");
+    // Node to iterate through evidence list
     EvidenceNodeType* i = hunter->evidenceList->head;
+    // ints to store amount of each type of evidence found
     int emfs = 0, temps = 0, fngrprnts = 0, sounds = 0;
+    // while it is possible to iterator
     while (i != NULL) {
+        // if the current evidence's value is ghostly
         if (isGhostlyVal(i->evidence)) {
+            // switch case to determine what to do based on evidenceClass
             switch (i->evidence->evidenceClass) {
                 case EMF:
-                    printf("    *   EMF with a value of %f\n", i->evidence->value);
+                    printf("    * EMF with a value of %f\n", i->evidence->value);
                     emfs++;
                     break;
 
                 case TEMPERATURE:
-                    printf("    *   Temperature with a value of %f°C\n", i->evidence->value);
+                    printf("    * Temperature with a value of %f°C\n", i->evidence->value);
                     temps++;
                     break;
 
@@ -186,15 +217,53 @@ void printSuspicions(HunterType* hunter) {
                     break;
 
                 case SOUND:
-                    printf("    *   Sound with a value of %f dB\n", i->evidence->value);
+                    printf("    * Sound with a value of %f dB\n", i->evidence->value);
                     sounds++;
                     break;
             }
         }
+        // go to next node in the list
         i = i->next;
     }
+    /* Since the fingerprints have values of 1 or 0
+    we decided to print the amount of fingerprints rather than their values */
     if (fngrprnts > 0)
-        printf("    *   %d set(s) of paranormal fingerprints\n", fngrprnts);
+        printf("    * %d set(s) of paranormal fingerprints\n", fngrprnts);
+
+    // call function to find out which type of ghost it was
+    determineGhostType(hunter->building, emfs, temps, fngrprnts, sounds);
+}
+
+// Function: determineGhostType
+//       in: Pointer BuildingType to check building's actual ghost type
+//       in: int representing amount of EMF type ghostly evidences
+//       in: int representing amount of temperature type ghostly evidences
+//       in: int representing amount of fingerprint type ghostly evidences
+//       in: int representing amount of sound type ghostly evidences
+//  Purpose: Determine and print the type of the ghost, then check if that is the correct type
+void determineGhostType(BuildingType* building, int emfs, int temps, int fingers, int sounds) {
+    // int to store the type we determine from the evidence, values are from the enum GhostClassType
+    int type = -1;
+    printf("\nAccording to the evidence collected, it would seem that the ghost is a ");
+    // if statements to determine the type of ghost based on evidence
+    if (emfs > 0 && temps > 0 && fingers > 0) {
+        printf("POLTERGEIST!\n");
+        type = 0;
+    } else if (emfs > 0 && temps > 0 && sounds > 0) {
+        printf("BANSHEE!\n");
+        type = 1;
+    } else if (emfs > 0 && sounds > 0 && fingers > 0) {
+        printf("BULLY!\n");
+        type = 2;
+    } else if (sounds > 0 && temps > 0 && fingers > 0) {
+        printf("PHANTOM!\n");
+        type = 3;
+    }
+    // statement to check if the ghostClass of the ghost in the building is equivalent to what we just determined
+    if (building->ghost->ghostClass == type)
+        printf("This deduction was correct!");
+    else
+        printf("This deduction was incorrect. :(");
 }
 
 /*

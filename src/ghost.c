@@ -1,26 +1,32 @@
 #include "defs.h"
 
 //   Function:  initGhost
-//         in:  Location of GhostType to be modified
-//         in:  Attributes of GhostType to be added
-//        out:  Modified GhostType
-//    Purpose:  Initializes all fields of the given GhostType parameter to parameters
-void initGhost(int bored, GhostClassType gt, GhostType** ghost) {
-    GhostType* newGhost = (GhostType*)malloc(sizeof(GhostType));  // allocate mem for new ghost
-    if (newGhost == NULL) {                                       // if memory failed to allocate, shut the program down
-        printf("Memory allocation error\n");
+//      in/ou:  Pointer to location of GhostType to initialize
+//         in:  GhostClassType to set ghost's class to
+//    Purpose:  Allocates and initializes the given GhostType
+void initGhost(GhostType** ghost, GhostClassType gt) {
+    //Allocating memory for ghost
+    GhostType* newGhost = (GhostType*)malloc(sizeof(GhostType));
+
+    //Checking if memory was allocated correctly
+    if (newGhost == NULL) {
+        printf("Memory allocation error: couldn't malloc new GhostType!\n");
         exit(C_MEM_ERR);
     }
-    // initialize fields to the given parameters
+
+    //Setting attributes of new GhostType
     newGhost->ghostClass = gt;
     newGhost->room = NULL;
-    newGhost->boredom = bored;
-    *ghost = newGhost;  // return this new structure using the ghost parameter
+    newGhost->boredom = BOREDOM_MAX;
+
+    //return newGhost structure using the pointer parameter
+    *ghost = newGhost;
 }
 
 //   Function:  hunterInRoom
-//         in:  Pointer to GhostType
-//    Purpose:  Check if there is a hunter in the same room as given ghost
+//         in:  Location of GhostType
+//    Purpose:  Checks if there is a hunter in the same room as given ghost
+//     Return:  Returns C_TRUE if there is a hunter in the same room, returns C_FALSE otherwise
 int hunterInRoom(GhostType* ghost) {
     if (ghost->room->hunterCount > 0)
         return C_TRUE;
@@ -28,9 +34,8 @@ int hunterInRoom(GhostType* ghost) {
 }
 
 //  Function: leaveEvidence
-//        in: Pointer to ghost that will be leaving the evidence
-//       out: Modified room that the ghost is in
-//   Purpose: Check if current room is available, if so create evidence and leave it in room
+//        in: Location of GhostType
+//   Purpose: Checks if current room is available, if so create evidence and leave it in room
 void leaveEvidence(GhostType* ghost) {
     // Check if current room is available for modification
     if (sem_trywait(&(ghost->room->mutex)) == 0) {
@@ -39,7 +44,7 @@ void leaveEvidence(GhostType* ghost) {
         initEvidence(&evidence);
 
         // Creating evidence based on ghost
-        createEvidence(ghost, evidence);
+        createEvidence(ghost->ghostClass, evidence);
 
         // Adding evidence to current room
         appendEvidence(&(ghost->room->evidenceList), evidence);
@@ -56,22 +61,26 @@ void leaveEvidence(GhostType* ghost) {
     }
 }
 
-//   Function:  makeMove
+//   Function:  moveGhost
 //      in/ou:  Location of GhostType
-//    Purpose:  Trys to move ghost to a random connected room, if rooms are locked, skips turn
+//    Purpose:  Tries to move ghost to a random adjacent room if rooms' mutexs are available
 void moveGhost(GhostType* ghost) {
     // Check if current room is available for modification
     if (sem_trywait(&(ghost->room->mutex)) == 0) {
         // Get a random connected room to move to
         int nextRoom = randInt(0, ghost->room->connectedRooms.roomCount);
+
+        //Looping to selected room
         RoomNodeType* iterator = ghost->room->connectedRooms.head;
         for (int i = 0; i < nextRoom; i++) {
             iterator = iterator->next;
         }
+
+        //Creating temporary pointers
         RoomType* newRoom = iterator->room;
         RoomType* currentRoom = ghost->room;
 
-        // Check if current room is available for modification
+        // Check if new room is available for modification
         if (sem_trywait(&(newRoom->mutex)) == 0) {
             // Move ghost to new room
             currentRoom->ghost = NULL;
@@ -101,20 +110,17 @@ void* startGhost(void* g) {
         // Check if ghost is in room with hunter
         if (hunterInRoom(ghost) == C_TRUE) {
             // Resetting boredom counter
-    
-
             ghost->boredom = BOREDOM_MAX;
 
-            // Choose to leave evidence (randInt == 0) or do nothing
+            // Choose to leave evidence: 20% to leave evidence, 80% to do nothing
             if (randInt(0, 5) == 0) {
                 leaveEvidence(ghost);
             }
 
-            // Ghost is alone in room
+        // Ghost is alone in room
         } else {
             // Decreasing boredom counter
-            ghost->boredom--;
-
+            ghost->boredom -= BOREDOM_RATE;
             // Checking if ghost is bored
             if (ghost->boredom <= 0) {
                 // Ending this thread by breaking main loop
@@ -122,20 +128,20 @@ void* startGhost(void* g) {
                 break;
             }
 
-            // Choose next action
+            // Choose next action, 20% to leave evidence, 20% to move, 60% to do nothing
             int rand = randInt(0, 5);
 
-            // Leave evidence
+            // Leaving evidence
             if (rand == 0) {
                 leaveEvidence(ghost);
 
-                // Move to an adjacent room
+            // Moving to an adjacent room
             } else if (rand == 1) {
                 moveGhost(ghost);
             }
         }
 
-        // Sleep
+        // Sleeping
         usleep(USLEEP_TIME);
     }
 }
