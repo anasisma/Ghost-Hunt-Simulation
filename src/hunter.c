@@ -2,6 +2,7 @@
 
 //   Function:  initHunter
 //      in/ou:  Pointer to location of HunterType to initialize
+//         in:  Pointer to string
 //    Purpose:  Allocates and initializes the given HunterType
 void initHunter(HunterType** hunter, char* name) {
     //Allocating memory for hunter
@@ -394,6 +395,7 @@ void* startHunter(void* h) {
         // Sleep
         usleep(USLEEP_TIME * 1.1);
     }
+    return (0);
 }
 
 // Function:  cleanupHunter

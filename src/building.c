@@ -6,10 +6,10 @@
 void initBuilding(BuildingType* building) {
     //Initlizing parameters
     building->ghost = NULL;
+    building->evidenceList.head = NULL;
+    building->evidenceList.tail = NULL;
     initRoomList(&(building->rooms));
-    EvidenceListType* list = &building->evidenceList;
-    initEvidenceList(&list);
-
+    
     // Initlizing mutex
     if (sem_init(&(building->mutex), 0, 1) < 0) {
         printf("Semaphore error: couldn't initlize building mutex!\n");

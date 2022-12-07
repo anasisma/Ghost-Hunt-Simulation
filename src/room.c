@@ -3,7 +3,7 @@
 //  Function: initRoom
 //     in/ou: Pointer to location of RoomType to initilize
 //        in: Pointer to string
-//   Purpose: Initializes fields of given room
+//   Purpose: Initializes the given room
 void initRoom(RoomType *room, char *name) {
     // Checking if room was allocated correctly (since calloc is called outside of initRoom)
     if (room == NULL) {
@@ -23,13 +23,12 @@ void initRoom(RoomType *room, char *name) {
     room->ghost = NULL;
 }
 
-/*   Function:  initRoomList                                        */
-/*         in:  Location of RoomListType to be modified            */
-/*        out:  Modified RoomListType                               */
-/*    Purpose:  initializes both fields of the given list parameter to default values      */
+//   Function:  initRoomList
+//      in/ou:  Location of RoomListType to initialize
+//    Purpose:  Initializes the given RoomListType
 void initRoomList(RoomListType *list) {
     list->head = NULL;
-    list->tail = NULL;  // set both head and tail (list starts as empty)
+    list->tail = NULL;
     list->roomCount = 0;
 }
 
@@ -45,11 +44,13 @@ void appendRoom(RoomListType *list, RoomNodeType *roomNode) {
         list->head = roomNode;
         list->tail = roomNode;
 
-        // Otherwise add node after the tail
+    // Otherwise add node after the tail
     } else {
         list->tail->next = roomNode;
         list->tail = roomNode;
     }
+
+    //Update room count
     list->roomCount++;
 }
 
@@ -58,11 +59,23 @@ void appendRoom(RoomListType *list, RoomNodeType *roomNode) {
 //     in/ou:  Location of second RoomType
 //   Purpose:  Add each room to each other's RoomListType
 void connectRooms(RoomType *r1, RoomType *r2) {
+    //Allocating new RoomNodeTypes
     RoomNodeType *n1 = (RoomNodeType *)malloc(sizeof(RoomNodeType));
     RoomNodeType *n2 = (RoomNodeType *)malloc(sizeof(RoomNodeType));
-    n1->room = r1;
-    n2->room = r2;
 
+    //Checking if nodes were allocated correctly
+    if (n1 == NULL || n2 == NULL) {
+        printf("Memory allocation error: couldn't malloc new RoomNodeType!\n");
+        exit(C_MEM_ERR);
+    }
+
+    //Settings nodes' attributes
+    n1->room = r1;
+    n1->next = NULL;
+    n2->room = r2;
+    n2->next = NULL;
+
+    //Adding nodes to each room's list
     appendRoom(&(r1->connectedRooms), n2);
     appendRoom(&(r2->connectedRooms), n1);
 }
@@ -84,7 +97,7 @@ void addHunter(RoomType *room, HunterType *hunter) {
     // Setting hunter's room attribute
     hunter->room = room;
 
-    // Incrementing the room's hunterCount
+    // Update hunter count
     room->hunterCount++;
 }
 
@@ -100,6 +113,7 @@ void removeHunter(RoomType *room, HunterType *hunter) {
         printf("Error remove hunter from room: room's hunters array is empty!\n");
         exit(C_ARR_ERR);
     }
+
     // loop through hunter array to find hunter we want to remove
     for (int i = 0; i < size; i++) {
         if (room->hunters[i] == hunter) {
@@ -107,6 +121,7 @@ void removeHunter(RoomType *room, HunterType *hunter) {
             for (int j = i; j < size - 1; j++) {
                 room->hunters[j] = room->hunters[j + 1];
             }
+
             // set whatever was at the end of the array to null and decrement hunterCount
             room->hunters[size] = NULL;
             room->hunterCount--;
@@ -116,6 +131,7 @@ void removeHunter(RoomType *room, HunterType *hunter) {
             return;
         }
     }
+
     // if this point is reached, the hunter wasn't found in the array
     printf("Error removing hunter from room: hunter not in room's hunters array!\n");
     exit(C_ARR_ERR);
@@ -123,18 +139,24 @@ void removeHunter(RoomType *room, HunterType *hunter) {
 
 //  Function:  cleanupRoom
 //     in/ou:  Location of RoomType to cleanup
-//   Purpose:  Free memory allocated for a particular room
+//   Purpose:  Frees all the memory associated with the given room
 void cleanupRoom(RoomType *room) {
-    // call the functions to clean each field of a room, then free the room itself
+    //Freeing evidence list's data
     cleanupEvidenceListData(&room->evidenceList);
+
+    //Freeing evidence list's nodes
     cleanupEvidenceListNodes(&room->evidenceList);
+
+    //Freeing room list's nodes
     cleanupRoomListNodes(&room->connectedRooms);
+
+    //Freeing room's pointer
     free(room);
 }
 
 //  Function:  cleanupRoomListNodes
 //     in/ou:  Location of RoomListType to cleanup
-//   Purpose:  Free memory allocated for the nodes of a particular roomlist (doesn't free it's data)
+//   Purpose:  Frees all the RoomNodeTypes contained in given linkedList
 void cleanupRoomListNodes(RoomListType *list) {
     // Temporary pointers
     RoomNodeType *currNode = list->head;
@@ -144,13 +166,16 @@ void cleanupRoomListNodes(RoomListType *list) {
     while (currNode != NULL) {
         nextNode = currNode->next;
 
-        // Freeing node and room
+        // Freeing node
         free(currNode);
 
         currNode = nextNode;
     }
 }
 
+//  Function:  cleanupRoomListData
+//     in/ou:  Location of RoomListType to cleanup
+//   Purpose:  Frees all the RoomTypes contained in given linkedList
 void cleanupRoomListData(RoomListType *list) {
     // Temporary pointers
     RoomNodeType *currNode = list->head;
@@ -160,7 +185,7 @@ void cleanupRoomListData(RoomListType *list) {
     while (currNode != NULL) {
         nextNode = currNode->next;
 
-        // Freeing node and room
+        // Freeing room
         cleanupRoom(currNode->room);
 
         currNode = nextNode;

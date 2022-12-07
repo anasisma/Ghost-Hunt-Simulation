@@ -222,6 +222,9 @@ int isGhostlyVal(EvidenceType* evidence) {
                 return (C_TRUE);
             }
             return (C_FALSE);
+        
+        default:
+            return (C_FALSE);
     }
 }
 

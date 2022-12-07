@@ -144,4 +144,5 @@ void* startGhost(void* g) {
         // Sleeping
         usleep(USLEEP_TIME);
     }
+    return (0);
 }

@@ -1,29 +1,26 @@
-CC = gcc
 LIB = -lpthread -lm
-OBJ = building evidence ghost hunter main room
-OBJ1 = building.c evidence.c ghost.c hunter.c main.c room.c
-OBJ2 = building.o evidence.o ghost.o hunter.o main.o room.o
+OBJ = building.o evidence.o ghost.o hunter.o main.o room.o
 
-all:
-	$(CC) -o final $(OBJ1) $(LIB) -g
+all: main room hunter ghost evidence building
+	gcc -o simulation $(OBJ) $(LIB)
 
-building: building.c
-	$(CC) building.c -c building $(LIB)
+main: main.c defs.h
+	gcc -c main.c
 
-evidence: evidence.c
-	$(CC) evidence.c -c evidence $(LIB)
+room: room.c defs.h
+	gcc -c room.c
 
-ghost: ghost.c
-	$(CC) ghost.c -c ghost $(LIB)
+hunter: hunter.c defs.h
+	gcc -c hunter.c
 
-hunter: hunter.c
-	$(CC) hunter.c -c hunter $(LIB)
+ghost: ghost.c defs.h
+	gcc -c ghost.c
 
-main: main.c
-	$(CC) main.c -c main $(LIB)
+evidence: evidence.c defs.h
+	gcc -c evidence.c
 
-room: room.c
-	$(CC) room.c -c room $(LIB)
+building: building.c defs.h
+	gcc -c building.c
 
 clean:
-	rm -f *.o *.d $(OBJ)
+	rm -f $(OBJ) simulation

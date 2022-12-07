@@ -80,6 +80,7 @@ int main(int argc, char* argv[]) {
     printf("\n");
     return 0;
 }
+
 // Function: placeGhostRandRoom
 //       in: Pointer to ghost to put in building
 //    in/ou: Pointer to building where ghost will be added
@@ -154,13 +155,20 @@ void printResults(BuildingType* building) {
     }
 }
 
+//  Function: printWinner
+//        in: Location of BuildingType
+//   Purpose: Prints wether the hunters or ghost won
 void printWinner(BuildingType* building) {
     int winners = C_FALSE;
+
+    //Checking if any of the hunters found the ghost
     for (int i = 0; i < MAX_HUNTERS; i++) {
         if (building->hunters[i]->suspicious) {
             winners = C_TRUE;
         }
     }
+
+    //Printing winner
     switch (winners) {
         case C_TRUE:
             printf("Hunters win! ");
