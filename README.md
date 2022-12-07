@@ -15,7 +15,7 @@ This program is a simulation of "Phasmaphobia", a game where 4 hunters must coll
 
 # Insructions:
 - Compilation: In the terminal, navigate to the directory where the files are saved. Afterwards, type "make" without the quotation marks.  
-- Launching and operating instructions: While in the directory where the compiled "a4" file is saved along with the others, type "./simulation" into the terminal to execute the program, again without any quotation marks. Outputs will be printed to and inputs will be read from the terminal.
+- Launching and operating instructions: While in the directory where the compiled "simulation" file is saved along with the others, type "./simulation" into the terminal to execute the program, again without any quotation marks. Outputs will be printed to and inputs will be read from the terminal.
 
 # Design decisions/bonus marks
 - Decided to have the hunters leave the van when they first spawn in, since the van won't have any evidence when first starting.  
@@ -24,6 +24,7 @@ This program is a simulation of "Phasmaphobia", a game where 4 hunters must coll
 - Changed the BOREDOM_MAX constant to 100 so that it would work better with various BOREDOM_RATE values, like 1, 2, 5, 10, etc.  
 - Increased the FEAR_RATE constant to 5, just to make hunters leave quicker (we found that encountering the ghost 100 times could take a while).  
 - Reduced the MAX_STR constant to 21 since 64 made our print formatting take a lot of space horizontally.  
+- Used GitHub
 
 # List of files: 
 - defs.h
