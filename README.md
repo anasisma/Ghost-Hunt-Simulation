@@ -20,3 +20,13 @@ This program is a simulation of "Phasmaphobia", a game where 4 hunters must coll
 - Changed the BOREDOM_MAX constant to 100 so that it would work better with various BOREDOM_RATE values, like 1, 2, 5, 10, etc.  
 - Increased the FEAR_RATE constant to 5, just to make hunters leave quicker (we found that encountering the ghost 100 times could take a while).  
 - Reduced the MAX_STR constant to 21 since 64 made our print formatting take a lot of space horizontally.  
+
+# List of files: 
+- defs.h
+- ghost.c
+- room.c
+- building.c
+- evidence.c
+- hunter.c
+- main.c
+- README.md
