@@ -29,4 +29,5 @@ This program is a simulation of "Phasmaphobia", a game where 4 hunters must coll
 - evidence.c
 - hunter.c
 - main.c
+- makefile
 - README.md
