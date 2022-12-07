@@ -25,6 +25,8 @@ This program is a simulation of "Phasmaphobia", a game where 4 hunters must coll
 - Increased the FEAR_RATE constant to 5, just to make hunters leave quicker (we found that encountering the ghost 100 times could take a while).  
 - Reduced the MAX_STR constant to 21 since 64 made our print formatting take a lot of space horizontally.  
 - Used GitHub
+- Used extra linkedlist to store all the evidence that hunters find throughout the simulation.  
+- Used print formatting for the decisions during the simulation.  
 
 # List of files: 
 - defs.h
