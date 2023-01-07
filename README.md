@@ -1,6 +1,6 @@
 # COMP2401 Final
 
-COMP2401B Final Project: Threads and Simulations
+Thread based “Phasmaphobia” simulation game
 
 # Program Authors  
 
@@ -17,21 +17,6 @@ This program is a simulation of "Phasmaphobia", a game where 4 hunters must coll
 - Launching and operating instructions: While in the /src directory where the compiled "simulation" file is saved along with the others, type "./simulation" into the terminal to execute the program, again without any quotation marks. Outputs will be printed to and inputs will be read from the terminal.
 - Cleaning: While in the /src directory, run the "make clean" command to remove the previously generated object files and executable.
 
-# Design decisions
-
-- Decided to have the hunters leave the van when they first spawn in, since the van won't have any evidence when first starting.  
-- Made hunters make moves based on a fixed probability, i.e. they have a higher chance of making certain actions compared to others, depending on the circumstance.  
-- Created a BOREDOM_RATE constant, to make it easier to change the speed at which the threads get bored.  
-- Changed the BOREDOM_MAX constant to 100 so that it would work better with various BOREDOM_RATE values, like 1, 2, 5, 10, etc.  
-- Increased the FEAR_RATE constant to 5, just to make hunters leave quicker (we found that encountering the ghost 100 times could take a while).  
-- Reduced the MAX_STR constant to 21 since 64 made our print formatting take a lot of space horizontally. (Hunter names have to be <= 20 characters)  
-
-# Bonus marks
-
-- Used github to allow for collaborative coding and version control. (Commit history screenshot included in submission)  
-- Used print formatting to make the simulation data clear and easy to read.  
-- Implemented a building shared evidence collection that all hunters pointed their evidence to, allowing for easy memory freeing and avoiding double freeing. 
-
 # List of files: 
 
 - defs.h
@@ -43,4 +28,3 @@ This program is a simulation of "Phasmaphobia", a game where 4 hunters must coll
 - main.c
 - makefile
 - README.md
-- CommitHistory.png
