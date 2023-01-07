@@ -4,8 +4,8 @@ Thread based “Phasmaphobia” simulation game
 
 # Program Authors  
 
-Adam Esanhaji github.com/Adamose  
-Anas Ismaili github.com/anasisma
+Adam Esanhaji
+Anas Ismaili
 
 # Description of the program:
 
