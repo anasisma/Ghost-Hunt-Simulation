@@ -4,7 +4,7 @@ Thread based “Phasmaphobia” simulation game
 
 # Program Authors  
 
-Adam Esanhaji
+Adam Esanhaji  
 Anas Ismaili
 
 # Description of the program:
