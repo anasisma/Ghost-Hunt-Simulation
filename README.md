@@ -1,4 +1,4 @@
-# COMP2401 Final: Threads and Simulations
+# Systems Programming Final Project: Threads and Simulations
 
 Thread based “Phasmaphobia” simulation game
 
