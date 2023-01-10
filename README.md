@@ -1,4 +1,4 @@
-# Systems Programming Final Project: Threads and Simulations
+# Systems Programming Project: Threads and Simulations
 
 Thread based “Phasmaphobia” simulation game
 
