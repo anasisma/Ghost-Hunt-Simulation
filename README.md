@@ -1,6 +1,6 @@
 # Systems Programming Project: Threads and Simulations
 
-Agent-based ghost hunt simulation made using low-level systems programming concepts in C.
+Agent-based ghost hunt simulation made using low-level systems programming concepts in C. Watch as 5 agents simultaneously make different decisions and interactions with one another in this closed simulated environment.
 
 # Program Authors  
 
